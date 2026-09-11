@@ -1,0 +1,8 @@
+namespace Mcm.Authorizations.Application.Features.Auth.Login
+{
+    public record LoginRequest
+    (
+        string Email,
+        string Password
+    );
+}

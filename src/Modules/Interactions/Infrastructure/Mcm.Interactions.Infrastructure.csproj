@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Infrastructure\Mcm.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\Application\Mcm.Interactions.Application.csproj" />
+  </ItemGroup>
+
+</Project>

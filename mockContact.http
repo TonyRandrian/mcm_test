@@ -1,0 +1,188 @@
+// Create Contact Company Type (ex: Prospect, Client, etc...)
+POST {urlBackend}/companies/typeContacts
+Request:
+{
+    "name": string,
+    "typeConvertTo": guid? // pour mise à jour du niveau d'un contact company Prospect -> Client
+}
+Response:
+{
+    "typeContactId": guid,
+}
+
+
+// Read all Contact Company Type
+GET {urlBackend}/companies/typeContacts?search={name: string?};page={page: int?};limit={limit: int?}
+Response:
+[
+    {
+        "id": guid,
+        "name": string,
+        "TypeConvertTo": guid?,
+        "TypeConvertName": string?
+    }
+]
+
+GET {urlBackend}/companies/typeContacts/{id: guid}
+Response:
+{
+    "id": guid,
+    "name": string,
+    "TypeConvertTo": guid?,
+    "TypeConvertName": string?
+}
+
+// Delete a Contact Company Type
+DELETE {urlBackend}/company/typeContacts/{id}?force={force: bool}
+
+
+// Update a Contact Company Type
+PUT {urlBackend}/company/typeContacts/{id}
+Request:
+{
+    "name": string,
+    "typeConvertTo": guid?
+}
+
+Response:
+{
+    "typeContactId": guid,
+}
+
+
+--------------------------------------------------------------------------------------
+
+// Create contact person
+POST {urlBackend}/contacts
+Request:
+{
+    "firstName": string,
+    "lastName": string,
+    "email": string,
+    "phone": string,
+    "poste": string?,
+    "cin": string?,
+    "associatedCompanyId": guid,
+    "SupplementaryValues": [
+        {
+            "propertyId": guid,
+            "value": string
+        }
+    ]
+}
+Response:
+{
+    "ContactId": guid
+}
+
+// Read contact
+GET {urlBackend}/contacts/{id: guid}
+Response:
+{
+    "firstName": string,
+    "lastName": string,
+    "email": string,
+    "phone": string,
+    "cin": string?,
+    "poste": string?,
+    "company": {
+        "id": guid,
+        "name": string
+    },
+    "SupplementaryValues": [
+        {
+            "categoryId": guid,
+            "categoryName": string,
+            "informations": [
+                "propertyId": guid,
+                "propertyName": string,
+                "value": string
+            ]
+        }
+    ]
+}
+
+GET {urlBackend}/contacts?search={fullName: string?},page={page: int?},limit={limit: int?}
+Response:
+[
+    {
+        "firstName": string,
+        "lastName": string,
+        "email": string,
+        "phone": string,
+        "companyId": guid?,
+        "cin": string?,
+        "poste": string?,
+        "Company": {
+            "id": guid?,
+            "name": string?
+        },
+        "SupplementaryValues": [
+            {
+                "categoryId": guid,
+                "categoryName": string,
+                "informations": [
+                    {
+                        "propertyId": guid,
+                        "propertyName": string,
+                        "value": string
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+
+// Delete a contact
+DELETE {urlBackend}/contacts/{id: guid}?Force={force: bool}
+
+
+// Update a contact
+PUT {urlBackend}/contacts/{id: guid}
+Request:
+{
+    "firstName": string,
+    "lastName": string,
+    "email": string,
+    "phone": string,
+    "companyId": guid?,
+    "cin": string?,
+    "poste": string?
+}
+
+// Update informations contact
+PUT {urlBackend}/contacts/{id}/values
+Request:
+{
+    "categoryId": guid,
+    "informations": [
+        {
+            "propertyId": guid,
+            "value": string
+        }
+    ]
+}
+Response:
+{
+    "ContactId": guid
+}
+
+// Update multiple informations contact
+PUT {urlBackend}/contacts/{id}/values
+Request:
+[
+    {
+        "categoryId": guid,
+        "informations": [
+            {
+                "propertyId": guid,
+                "value": string
+            }
+        ]
+    }
+]
+Response:
+{
+    "ContactId": guid
+}

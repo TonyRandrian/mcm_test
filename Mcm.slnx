@@ -1,0 +1,95 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/API/">
+    <Project Path="src/API/API.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Authorizations/" />
+  <Folder Name="/src/Modules/Authorizations/Application/">
+    <Project Path="src/Modules/Authorizations/Application/Mcm.Authorizations.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorizations/Domain/">
+    <Project Path="src/Modules/Authorizations/Domain/Mcm.Authorizations.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorizations/Infrastructure/">
+    <Project Path="src/Modules/Authorizations/Infrastructure/Mcm.Authorizations.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Authorizations/Presentation/">
+    <Project Path="src/Modules/Authorizations/Presentation/Mcm.Authorizations.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/" />
+  <Folder Name="/src/Modules/Catalog/Application/">
+    <Project Path="src/Modules/Catalog/Application/Mcm.Catalog.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Domain/">
+    <Project Path="src/Modules/Catalog/Domain/Mcm.Catalog.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Infrastructure/">
+    <Project Path="src/Modules/Catalog/Infrastructure/Mcm.Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Catalog/Presentation/">
+    <Project Path="src/Modules/Catalog/Presentation/Mcm.Catalog.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Company/" />
+  <Folder Name="/src/Modules/Company/Application/">
+    <Project Path="src/Modules/Company/Application/Mcm.Company.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Company/Domain/">
+    <Project Path="src/Modules/Company/Domain/Mcm.Company.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Company/Infrastructure/">
+    <Project Path="src/Modules/Company/Infrastructure/Mcm.Company.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Company/Presentation/">
+    <Project Path="src/Modules/Company/Presentation/Mcm.Company.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Contacts/" />
+  <Folder Name="/src/Modules/Contacts/Application/">
+    <Project Path="src/Modules/Contacts/Application/Mcm.Contacts.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Contacts/Domain/">
+    <Project Path="src/Modules/Contacts/Domain/Mcm.Contacts.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Contacts/Infrastructure/">
+    <Project Path="src/Modules/Contacts/Infrastructure/Mcm.Contacts.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Contacts/Presentation/">
+    <Project Path="src/Modules/Contacts/Presentation/Mcm.Contacts.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Interactions/" />
+  <Folder Name="/src/Modules/Interactions/Application/">
+    <Project Path="src/Modules/Interactions/Application/Mcm.Interactions.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Interactions/Domain/">
+    <Project Path="src/Modules/Interactions/Domain/Mcm.Interactions.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Interactions/Infrastructure/">
+    <Project Path="src/Modules/Interactions/Infrastructure/Mcm.Interactions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Interactions/Presentation/">
+    <Project Path="src/Modules/Interactions/Presentation/Mcm.Interactions.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Property/" />
+  <Folder Name="/src/Modules/Property/Application/">
+    <Project Path="src/Modules/Property/Application/Mcm.Property.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Property/Domain/">
+    <Project Path="src/Modules/Property/Domain/Mcm.Property.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Property/Infrastructure/">
+    <Project Path="src/Modules/Property/Infrastructure/Mcm.Property.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Property/Presentation/">
+    <Project Path="src/Modules/Property/Presentation/Mcm.Property.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/" />
+  <Folder Name="/src/Shared/Application/">
+    <Project Path="src/Shared/Application/Mcm.Shared.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/Domain/">
+    <Project Path="src/Shared/Domain/Mcm.Shared.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/Infrastructure/">
+    <Project Path="src/Shared/Infrastructure/Mcm.Shared.Infrastructure.csproj" />
+  </Folder>
+</Solution>

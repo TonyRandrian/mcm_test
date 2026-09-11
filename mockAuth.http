@@ -1,0 +1,60 @@
+// Register principal company and admin
+POST {urlBackend}/auth/register
+Request:
+{
+    "name": string,
+    "acronym": string?,
+    "description": string?,
+    "logo": Image,
+    "SupplementaryValues: [
+        {
+            "propertyId": guid,
+            "value": string
+        }
+    ],
+    "firstName": string,
+    "lastName": string,
+    "email": string,
+    "password": string
+}
+
+POST {urlBackend}/auth/login
+Request:
+{
+    "email": string,
+    "password": string
+}
+Response:
+{
+    token: string,
+    companyId: guid
+}
+
+POST {urlBackend}/auth/login-forgetting-password
+Request:
+{
+    "email": string,
+    "defaultPassword": string
+}
+Response:
+{
+    token: string,
+    companyId: guid
+}
+
+POST {urlBackend}/auth/check-email
+Request:
+{
+    "email": string
+}
+Response:
+{
+    email: string
+}
+
+POST {urlBackend}/auth/forget-password
+Request:
+{
+    "email": string
+}
+

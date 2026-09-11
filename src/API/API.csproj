@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d941883f-bce0-42bf-ac34-6bcd6656186e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Interactions\Application\Mcm.Interactions.Application.csproj" />
+    <ProjectReference Include="..\Modules\Interactions\Infrastructure\Mcm.Interactions.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Interactions\Presentation\Mcm.Interactions.Presentation.csproj" />
+    <ProjectReference Include="..\Shared\Application\Mcm.Shared.Application.csproj" />
+    <ProjectReference Include="..\Shared\Infrastructure\Mcm.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Company\Infrastructure\Mcm.Company.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Property\Infrastructure\Mcm.Property.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Property\Application\Mcm.Property.Application.csproj" />
+    <ProjectReference Include="..\Modules\Company\Presentation\Mcm.Company.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Property\Presentation\Mcm.Property.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Catalog\Presentation\Mcm.Catalog.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Catalog\Application\Mcm.Catalog.Application.csproj" />
+    <ProjectReference Include="..\Modules\Catalog\Infrastructure\Mcm.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Authorizations\Infrastructure\Mcm.Authorizations.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Authorizations\Application\Mcm.Authorizations.Application.csproj" />
+    <ProjectReference Include="..\Modules\Authorizations\Presentation\Mcm.Authorizations.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Contacts\Application\Mcm.Contacts.Application.csproj" />
+    <ProjectReference Include="..\Modules\Contacts\Infrastructure\Mcm.Contacts.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Contacts\Presentation\Mcm.Contacts.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+# ### Forget Password - POST request
+# POST {{baseUrl}}/api/auth/forget-password
+# Content-Type: {{contentType}}
+
+# {
+#   "email": string[contains @],
+#   "password": string
+# }
+
+# ### Response:
+# ### {
+# ###   "success": true,
+# ###   "data": {
+# ###     "id": "550e8400-e29b-41d4-a716-446655440001"
+# ###   },
+# ###   "message": "Password reset successful",
+# ###   "meta": null
+# ### }

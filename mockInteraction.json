@@ -1,0 +1,305 @@
+// Delete Interaction /
+DELETE {urlBackend}/api/interactions/{id}?Force={force}
+Request: {}
+
+// Create Interaction
+POST {urlBackend}/api/interactions
+Request: {
+    "title": string,
+    "typeId": guid,
+    "note": string?,
+    "date": {
+        "startDate": string,
+        "endDate": string?
+    },
+    "reminder": {
+        "type": string?,
+        "value": int?,
+        "repeat": int?
+    },
+    "participant": {
+        "members": List<Guid>,
+        "contacts": List<Guid>
+    },
+    "informations": [
+        {
+            "typeFieldId": guid,
+            "value": string
+        }
+    ]
+}
+Response: {
+    "interactionId": guid
+}
+
+// Get All Interaction by currentUser
+GET {urlBackend}/api/interactions
+Response: [
+    {
+        "id": guid,
+        "title": string,
+        "type": {
+            "id": guid,
+            "title": string,
+            "labelColor": string
+        },
+        "date": {
+            "startDate": string,
+            "startHour": string,
+            "endDate": string?,
+            "endHour": string?
+        },
+        "reportId": guid?
+    }
+]
+
+// GetById Task
+GET {urlBackend}/api/interactions/{id}
+Response:
+{
+    "id": guid,
+    "title": string,
+    "note": string?,
+    "type": {
+        "id": guid,
+        "title": string,
+        "labelColor": string
+    },
+    "date": {
+        "startDate": string,
+        "startHour": string,
+        "endDate": string?,
+        "endHour": string?
+    },
+    "reminder": {
+        "type": string,
+        "value": int,
+        "repeat": int
+    },
+    "reportId": guid?,
+    "participant": {
+        "members": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string,
+                "image": string,
+            }
+        ],
+        "contacts": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string,
+                "image": string
+            }
+        ]
+    },
+    "attachments": [
+        {
+            "contentType": string,
+            "url": string
+        }
+    ]
+}
+
+PUT {urlBackend}/api/interactions/{id}
+Request: {
+    "title": string,
+    "typeId": guid,
+    "note": string?,
+    "date": {
+        "startDate": string,
+        "endDate": string?
+    },
+    "reminder": {
+        "type": string?,
+        "value": int?,
+        "repeat": int?
+    },
+    "participant": {
+        "members": List<Guid>,
+        "contacts": List<Guid>
+    },
+    "informations": [
+        {
+            "typeFieldId": guid,
+            "value": string
+        }
+    ]
+}
+Response: {
+    "interactionId": guid
+}
+
+PUT {urlBackend}/api/interactions/{id}/attachments
+Request: {
+    "attachment": string[],
+    "newAttachment": List<IFormFile>
+}
+Response: {
+    "interactionId": guid
+}
+
+// Alert notification interactions
+{urlBackend}/hub/notifications/interactions
+Response: {
+    "Type": string,
+    "title": string,
+    "startDate": string,
+    "message": string,
+}
+
+// Create Reports
+POST {urlBackend}/api/interactions/{id}/report
+Request: {
+    "name": string,
+    "description":string,
+    "actionPlan": string,
+    "date": {
+        "startDate": string,
+        "endDate": string
+    },
+    "present": {
+        "contacts": List<Guid>,
+        "teamMembers": List<Guid>
+    },
+    "attachments": List<IFormFile>
+}
+Response: {
+    "interactionId": guid
+}
+
+// Get Report by id
+GET {urlBackend}/api/interactions/{id}/report
+Request: {
+    "name": string,
+    "description":string,
+    "actionPlan": string,
+    "date": {
+        "startDate": string,
+        "endDate": string,
+    },
+    "members": {
+        "present": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string
+            }
+        ],
+        "absent": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string
+            }
+        ]
+    },
+    "contacts": {
+        "present": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string
+            }
+        ],
+        "absent": [
+            {
+                "id": guid,
+                "firstName": string,
+                "lastName": string
+            }
+        ]
+    },
+    "attachments": [
+        {
+            "url": string,
+            "contentType": string
+        }
+    ]
+}
+Response: {
+    "interactionId": guid
+}
+
+// Create InteractionType
+POST {urlBackend}/api/interactionTypes
+Request: {
+    "parentId": guid,
+    "title": string,
+    "description": string?,
+    "labelColor": string,
+}
+Response: {
+    "interactionTypeId": guid
+}
+
+GET {urlBackend}/api/interactionTypes
+Response: [
+    {
+        "id": guid,
+        "title": string,
+        "labelColor": string,
+    }
+]
+// GetById Task
+GET {urlBackend}/api/interactionTypes/{id}
+Response: {
+    "id": guid,
+    "title": string,
+    "description": string?,
+    "labelColor": string,
+    "parent": {
+        "id": guid,
+        "title": string
+    }
+}
+
+PUT {urlBackend}/api/interactionTypes/{id}
+Request: {
+    "title": string,
+    "description": string?,
+    "labelColor": string,
+}
+Response: {
+    "interactionTypeId": guid
+}
+
+DELETE {urlBackend}/interactionTypes/{id}?Force={force}
+Request: {}
+
+
+// Create TypeField
+POST {urlBackend}/api/interactionTypes/{id}/fields
+Request: [
+    {
+        "name": string,
+        "propertyType": string
+    }
+]
+Response: {
+    "interactionTypeId": guid
+}
+
+GET {urlBackend}/api/interactionTypes/{id}/fields
+Response: [
+    {
+        "id": guid,
+        "name": string,
+        "propertyType": string
+    }
+]
+
+PUT {urlBackend}/api/interactionTypes/{id}/fields/{fieldId}
+Request: {
+    "title": string,
+    "description": string?,
+    "labelColor": string
+}
+Response: {
+    "typeFieldId": guid
+}
+
+DELETE {urlBackend}/interactionTypes/{id}/fields/{fieldId}?Force={force}
+Request: {}
