@@ -2,6 +2,7 @@ using Mcm.Catalog.Application.Features.Currencies.Queries.GetAllCurrency;
 using Mcm.Catalog.Application.Features.ProductCategories.Queries.GetAllProductCategory;
 using Mcm.Shared.Application.Common;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Catalog.Presentation.Controllers;

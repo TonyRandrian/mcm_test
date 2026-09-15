@@ -1,4 +1,5 @@
 using System.Reflection;
+using Mcm.Authorizations.Domain.Events;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Extensions;
@@ -8,7 +9,7 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Authorizations.Domain.Entities
 {
-    public class Role : AuditableEntity, ITenantScoped
+    public class Role : AggregateRoot, ITenantScoped
     {
         public Name Title { get; private set; } = null!;
         public string Description
@@ -32,10 +33,15 @@ namespace Mcm.Authorizations.Domain.Entities
             Title = title;
             Description = description;
             IsSystem = isSystem;
+
         }
 
         public static Role Create(string title, string description, bool isSystem = false)
-            => new(title, description, isSystem);
+        {
+            Role role = new(title, description, isSystem);
+            role.RaiseDomainEvent(new RoleCreatedEvent(role.Id, role.Title));
+            return role;
+        }
 
         public void Update(string? title, string? description)
         {
@@ -43,6 +49,13 @@ namespace Mcm.Authorizations.Domain.Entities
                 Title = title;
             if (description is not null)
                 Description = description;
+            RaiseDomainEvent(new RoleUpdatedEvent(Id, Title));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new RoleDeletedEvent(Id, Title));
         }
 
         public void AddPermission(PermModule module, PermAction action)
@@ -54,11 +67,21 @@ namespace Mcm.Authorizations.Domain.Entities
                 return;
             _authorizations.Add(Permission.Create(Id, module, action, TenantId));
         }
+
+        public void AddManyPermission(IEnumerable<(PermModule module, PermAction action)> perms)
+        {
+            var inexist = perms.Where(perm => 
+                !_authorizations.Select(a => (a.Module, a.Action)).Contains(perm));
+            List<Permission> permissions = inexist.Select(p =>
+                Permission.Create(Id, p.module, p.action, TenantId)).ToList();
+            _authorizations.AddRange(permissions);
+        }
+        
         public void SyncPermissions(IEnumerable<(PermModule, PermAction)> perms)
         {
             var permHash = perms.ToHashSet();
             _authorizations.RemoveAll(a => !permHash.Contains((a.Module, a.Action)));
-            foreach (var (module, action) in perms.ToList())
+            foreach (var (module, action) in permHash.ToList())
             {
                 this.AddPermission(module, action);           
             }
@@ -89,6 +112,15 @@ namespace Mcm.Authorizations.Domain.Entities
             if (exist)
                 return;
             _members.Add(RoleTeamMember.Create(Id, tmId, TenantId));
+        }
+
+        public void RemoveMember(Guid tmId)
+        {
+            var member = _members.FirstOrDefault(a => 
+                a.TeamMemberId == tmId);
+            if (member is null)
+                return;
+            _members.Remove(member);
         }
     }
 }

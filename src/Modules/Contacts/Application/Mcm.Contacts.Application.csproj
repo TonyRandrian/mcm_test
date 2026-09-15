@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Application\Mcm.Shared.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Domain\Mcm.Shared.Domain.csproj" />
     <ProjectReference Include="..\Domain\Mcm.Contacts.Domain.csproj" />
   </ItemGroup>
 

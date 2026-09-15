@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Mcm.Interactions.Application.Features.InteractionTypes.Commands.CreateInteractionType;
 using Mcm.Interactions.Application.Features.InteractionTypes.Commands.DeleteInteractionType;
 using Mcm.Interactions.Application.Features.InteractionTypes.Commands.UpdateInteractionType;
@@ -7,8 +6,8 @@ using Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetInteract
 using Mcm.Interactions.Application.Features.TypeFields.Commands.CreateTypeField;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Interactions.Presentation.Controllers;
@@ -20,6 +19,7 @@ public class InteractionTypeController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.InteractionType, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateInteractionTypeResponse>>> Create(
         [FromBody] CreateInteractionTypeRequest body)
@@ -34,7 +34,7 @@ public class InteractionTypeController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.View_Company)] 
+    [HasAuthorization(PermModule.InteractionType, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetInteractionTypeResponse>>> GetById(        
         Guid Id)
@@ -45,7 +45,7 @@ public class InteractionTypeController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.InteractionType, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateInteractionTypeResponse>>> Update(
         Guid Id, [FromBody] UpdateInteractionTypeRequest body)
@@ -75,9 +75,9 @@ public class InteractionTypeController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.InteractionType, PermAction.Delete)]
     [HttpDelete("{Id}")]
-    public async Task<ActionResult<ApiResponse<DeleteInteractionTypeResponse>>> DeleteCompany   
+    public async Task<ActionResult<ApiResponse<DeleteInteractionTypeResponse>>> Delete   
         (Guid Id, [FromQuery] DeleteInteractionTypeRequest request)
     {
         var res = await _mediator.Send(new DeleteInteractionTypeCommand
@@ -88,6 +88,7 @@ public class InteractionTypeController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.InteractionType, PermAction.Create)]
     [HttpPost("{Id}/fields")]
     public async Task<ActionResult<ApiResponse<CreateTypeFieldResponse>>> AddField(
         Guid Id,

@@ -12,8 +12,8 @@ public class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCate
 
         builder.HasKey(e => e.Id);
 
-        builder.Navigation(e => e.ProductRelations)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(e => e.ProductRelations)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

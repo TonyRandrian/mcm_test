@@ -25,14 +25,16 @@ namespace Mcm.Interactions.Application.Features.TypeFields.Commands.CreateTypeFi
         {
             var interactionType = await _interactionTypeRepository.GetByIdAsync(command.InteractionTypeId)
                 ?? throw NotFoundException.NotFoundById(nameof(InteractionType), command.InteractionTypeId);
-
-            // TO DO : check doubled
-            // var exists = await _interactionTypeRepository.Validate()
             
             var field = TypeField.Create(
                 interactionType.Id,
                 command.Name,
                 command.Type);
+
+            var exists = await _typeFieldRepository.Validate(
+                t => t.Equals(field));
+            if (exists is not null)
+                throw BadRequestException.Exist(nameof(TypeField));
             
             await _typeFieldRepository.AddAsync(field);
             await _uow.SaveChangesAsync(ct);
@@ -41,7 +43,7 @@ namespace Mcm.Interactions.Application.Features.TypeFields.Commands.CreateTypeFi
                 Success = true,
                 Message = "TypeField created succesfully",
                 Code = 200,
-                Data = new CreateTypeFieldResponse{InteractionTypeId = field.Id}
+                Data = new CreateTypeFieldResponse{InteractionTypeId = interactionType.Id}
             };
         }
     }

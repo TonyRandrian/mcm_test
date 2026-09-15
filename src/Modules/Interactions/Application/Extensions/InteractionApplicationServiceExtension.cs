@@ -1,6 +1,8 @@
 using System.Reflection;
-using Mcm.Interactions.Application.Features.Notification;
+using Mcm.Interactions.Application.Features.Notifications;
 using Mcm.Interactions.Application.Interfaces;
+using Mcm.Shared.Application.Extensions;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mcm.Interactions.Application.Extensions
@@ -16,6 +18,8 @@ namespace Mcm.Interactions.Application.Extensions
 
             services.AddSignalR(options =>
                 options.EnableDetailedErrors = true);
+            services.AddSingleton<IUserIdProvider, SignalRExtension>();
+            services.AddSingleton<IConnectionManager, ConnectionManager>();
             services.AddScoped<IInteractionNotificationService, InteractionNotificationService>();
             services.AddHostedService<InteractionService>();
 

@@ -30,9 +30,9 @@ public class CategoryConfiguration: IEntityTypeConfiguration<Category>
                 .HasForeignKey(catEnt => catEnt.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
         
-        builder.Navigation(c => c.Properties)
-            .AutoInclude();
-        builder.Navigation(c => c.Entities)
-            .AutoInclude();
+        // builder.Navigation(c => c.Properties)
+        //     .AutoInclude();
+        // builder.Navigation(c => c.Entities)
+        //     .AutoInclude();
     }
 }

@@ -24,7 +24,7 @@ namespace Mcm.Company.Application.Features.Company.Commands.AddCompanyValue
                     var property = await _propertyModule.GetByIdAsync(value.PropertyId);
                     if (property is not null)
                     {
-                        company.AddValue(value.Value, property.Id, property.IsMultiple);
+                        company.AddValue(value.Value, property.Id, property.IsMultiple, property.IsSensitive);
                     }
                     
                 }

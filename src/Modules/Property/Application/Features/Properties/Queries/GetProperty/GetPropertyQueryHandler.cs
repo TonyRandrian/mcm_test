@@ -25,7 +25,8 @@ namespace Mcm.Property.Application.Features.Properties.Queries.GetProperty
                     Type = res.Type.ToString(),
                     Description = res.Description,
                     IsRequired = res.IsRequired, 
-                    IsMultiple = res.IsMultiple, 
+                    IsMultiple = res.IsMultiple,
+                    IsSensitive = res.IsSensitive 
                 }
             };
         }

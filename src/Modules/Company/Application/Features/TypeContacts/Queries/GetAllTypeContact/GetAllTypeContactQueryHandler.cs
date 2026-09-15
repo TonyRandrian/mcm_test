@@ -14,10 +14,12 @@ namespace Mcm.Company.Application.Features.TypeContacts.Queries.GetAllTypeContac
         public async Task<ApiResponse<GetAllTypeContactResponse>> Handle(GetAllTypeContactQuery query, CancellationToken cancellationToken)
         {
             var typeContacts = await _typeContactRepository.GetAllAsync(
-                predicate: p => (
-                    (string.IsNullOrEmpty(query.Request.SearchName) || p.Name.Value.Contains(query.Request.SearchName, StringComparison.CurrentCultureIgnoreCase))),
+                predicate: p => 
+                    string.IsNullOrEmpty(query.Request.SearchName) || 
+                    p.Name.Value.ToLower().Contains(query.Request.SearchName.ToLower()),
                 orderBy: p => p.OrderBy(t => t.Name.Value),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit));
+                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit),
+                ct: cancellationToken);
             
             
             var data = typeContacts.Select(res => new TypeContactResponse

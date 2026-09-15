@@ -11,5 +11,12 @@ namespace Mcm.Catalog.Infrastructure.Repositories
     public class ServiceRepository(CatalogDbContext context)
         : GenericRepository<Service>(context), IServiceRepository
     {
+        public override Task<Service?> GetByIdAsync(Guid id)
+        {
+            IQueryable<Service> query = _dbSet
+                .Include(s => s.Currency)
+                .Include(s => s.Category);
+            return query.FirstOrDefaultAsync(s => s.Id == id);
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace Mcm.Shared.Domain.Events
 {
     public record CompanyDeletedEvent
     (
-        Guid CompanyId
+        Guid CompanyId,
+        string Name
     )  : IDomainEvent;
 }

@@ -14,13 +14,11 @@ namespace Mcm.Contacts.Application.Features.Contacts.Commands.Events
         public async Task Handle(CompanyDeletedEvent notification, CancellationToken cancellationToken)
         {
             var contacts = await _contactRepository.GetAllAsync(
-                predicate: c => c.AssociatedCompanyId == notification.CompanyId
-            );
+                predicate: c => c.AssociatedCompanyId == notification.CompanyId,
+                ct: cancellationToken);
 
             foreach (var contact in contacts)
-            {
                 contact.Delete();
-            }
 
             await _uow.SaveChangesAsync(cancellationToken);
         }

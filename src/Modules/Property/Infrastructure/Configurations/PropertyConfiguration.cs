@@ -22,8 +22,8 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Domain.Entities.Pr
         //         .WithMany(category => category.Properties)
         //         .HasForeignKey(property => property.CategoryId)
         //         .OnDelete(DeleteBehavior.Restrict);
-        builder.Navigation(p => p.Category)
-            .AutoInclude();
+        // builder.Navigation(p => p.Category)
+        //     .AutoInclude();
     }
 
 }

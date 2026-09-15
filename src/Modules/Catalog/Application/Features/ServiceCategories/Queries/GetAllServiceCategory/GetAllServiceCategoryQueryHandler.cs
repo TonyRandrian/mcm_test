@@ -15,11 +15,12 @@ namespace Mcm.Catalog.Application.Features.ServiceCategories.Queries.GetAllServi
         public async Task<ApiResponse<GetAllServiceCategoryResponse>> Handle(GetAllServiceCategoryQuery query, CancellationToken cancellationToken)
         {
             var categories = await _ServiceCategoryRepository.GetAllAsync(
-                predicate: p => (
-                    (string.IsNullOrEmpty(query.Request.searchName) || p.Name.Contains(query.Request.searchName))),
-                orderBy: p => p.OrderDescending(),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit));
-            
+                includes: [sc => sc.Services],
+                predicate: p => 
+                    string.IsNullOrEmpty(query.Request.searchName) ||
+                    p.Name.Contains(query.Request.searchName), 
+                orderBy: p => p.OrderBy(sc => sc.Name),
+                ct: cancellationToken);
             
             var tree = categories.ToDictionary(
                 x => x.Id,
@@ -42,6 +43,8 @@ namespace Mcm.Catalog.Application.Features.ServiceCategories.Queries.GetAllServi
             var data = categories
                 .Where(x => x.ParentCategoryId == null)
                 .Select(x => tree[x.Id])
+                .Skip((query.Request.Page - 1) * query.Request.Limit)
+                .Take(query.Request.Limit)
                 .ToList();
 
             return new ApiResponse<GetAllServiceCategoryResponse>
@@ -54,7 +57,10 @@ namespace Mcm.Catalog.Application.Features.ServiceCategories.Queries.GetAllServi
                 {
                     Page = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _ServiceCategoryRepository.CountAsync()
+                    Total = await _ServiceCategoryRepository.CountAsync(
+                        predicate: p => 
+                        string.IsNullOrEmpty(query.Request.searchName) || 
+                        p.Name.Contains(query.Request.searchName))
                 }
             };
         }

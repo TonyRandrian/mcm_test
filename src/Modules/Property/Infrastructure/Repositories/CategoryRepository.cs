@@ -11,4 +11,11 @@ namespace Mcm.Property.Infrastructure.Repositories;
 public class CategoryRepository(PropertyDbContext context)
     : GenericRepository<Category>(context), ICategoryRepository
 {
+    public override Task<Category?> GetByIdAsync(Guid id)
+    {
+        IQueryable<Category> query = _dbSet
+            .Include(c => c.Properties)
+            .Include(c => c.Entities);
+        return query.FirstOrDefaultAsync(c => c.Id == id);
+    }
 }

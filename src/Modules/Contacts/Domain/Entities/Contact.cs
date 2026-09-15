@@ -1,12 +1,15 @@
 using System.Security.Cryptography.X509Certificates;
+using Mcm.Contacts.Domain.Events;
 using Mcm.Shared.Domain.Exceptions;
+using Mcm.Shared.Domain.Extensions;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Contacts.Domain.Entities
 {
-    public class Contact : AuditableEntity, ITenantScoped
+    public class Contact
+        : AggregateRoot, ITenantScoped
     {
         public Identity Identity { get; private set; } = null!;
         public Guid CompanyId { get; private set; }
@@ -30,7 +33,11 @@ namespace Mcm.Contacts.Domain.Entities
         }
 
         public static Contact Create(Identity identity, string? cin, string? phone, Guid associatedCompanyId, Guid companyId)
-            => new(identity, cin, phone, associatedCompanyId, companyId);
+        {
+            Contact contact = new(identity, cin, phone, associatedCompanyId, companyId);
+            contact.RaiseDomainEvent(new ContactCreatedEvent(contact.Id, contact.Identity.FullName));
+            return contact;
+        }
 
         public void Update(Identity? identity, string? cin, string? phone, Guid? associatedCompanyId)
         {
@@ -39,17 +46,30 @@ namespace Mcm.Contacts.Domain.Entities
             if (phone is not null) ChangeInformation(this.Cin ?? string.Empty, phone);
             if (associatedCompanyId.HasValue) ChangeAssociatedCompany(associatedCompanyId.Value);
             SetUpdatedAt();
+            RaiseDomainEvent(new ContactUpdatedEvent(Id, Identity.FullName));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new ContactDeletedEvent(Id, Identity.FullName));
         }
 
         public void UpdateImage(Resource image)
             => Image = image;
 
-        public void AddValue(string data, Guid propertyId, bool isMultiple = false)
+        public void AddValue(string data, Guid propertyId, bool isMultiple, bool isSensitive)
         {
             if (_values.Any(v => v.PropertyId == propertyId && !isMultiple))
                 throw new DomainException("Can't upload multiple data in this property");
             
-            var value = ContactValue.Create(Id, propertyId, data, TenantId);
+            var value = ContactValue.Create(
+                Id, 
+                propertyId, 
+                isSensitive
+                    ? EncryptationExtension.Encrypt(data)
+                    : data,
+                TenantId);
             _values.Add(value);
         }
 

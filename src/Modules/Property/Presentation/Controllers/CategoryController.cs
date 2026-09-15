@@ -1,10 +1,13 @@
 using Mcm.Property.Application.Features.Categories.Commands.CreateCategory;
 using Mcm.Property.Application.Features.Categories.Commands.DeleteCategory;
+using Mcm.Property.Application.Features.Categories.Commands.SetCategoryVisibility;
 using Mcm.Property.Application.Features.Categories.Commands.UpdateCategory;
 using Mcm.Property.Application.Features.Categories.Queries.GetAllCategory;
 using Mcm.Property.Application.Features.Categories.Queries.GetCategory;
 using Mcm.Property.Application.Features.Properties.Commands.CreateProperty;
 using Mcm.Shared.Application.Common;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +20,7 @@ public class CategoryController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
-    // [HasAuthorization(PermissionsEnum.Create_Category)]
+    [HasAuthorization(PermModule.Category, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateCategoryResponse>>> Create(
         [FromBody] CreateCategoryRequest body)
@@ -40,6 +43,7 @@ public class CategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.Category, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetCategoryResponse>>> GetById(
         Guid Id)
@@ -48,7 +52,7 @@ public class CategoryController(IMediator mediator)
         return Ok(result);
     }
 
-    // // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.Category, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateCategoryResponse>>> Update(
         Guid Id, [FromBody] UpdateCategoryRequest body)
@@ -63,7 +67,21 @@ public class CategoryController(IMediator mediator)
         return Ok(result);
     }
 
-    // // [HasAuthorization(PermissionsEnum.Delete_Category)]
+    [HasAuthorization(PermModule.Category, PermAction.Update)]
+    [HttpPut("{Id}/visibility")]
+    public async Task<ActionResult<ApiResponse<SetCategoryVisibilityResponse>>> UpdateVisibility(
+        Guid Id, [FromBody] SetCategoryVisibilityRequest body)
+    {
+        var result = await _mediator.Send(new SetCategoryVisibilityCommand
+        {
+            CategoryId = Id,
+            EntityType = body.EntityType,
+            IsVisibleInProfile = body.IsVisibleInProfile
+        });
+        return Ok(result);
+    }
+
+    [HasAuthorization(PermModule.Category, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteCategoryResponse>>> Delete(
         Guid Id, [FromQuery] DeleteCategoryRequest request)
@@ -77,7 +95,7 @@ public class CategoryController(IMediator mediator)
         return Ok(result);
     }
 
-    // // [HasAuthorization(PermissionsEnum.Create_Property)]
+    [HasAuthorization(PermModule.Category, PermAction.Create)]
     [HttpPost("{Id}/property")]
     public async Task<ActionResult<ApiResponse<CreatePropertyResponse>>> CreateProperty(
         Guid Id, [FromBody] CreatePropertyRequest body)
@@ -90,6 +108,7 @@ public class CategoryController(IMediator mediator)
             Type = body.Type,
             IsMultiple = body.IsMultiple,
             IsRequired = body.IsRequired,
+            IsSensitive = body.IsSensitive
         });
         return Ok(result);
     }

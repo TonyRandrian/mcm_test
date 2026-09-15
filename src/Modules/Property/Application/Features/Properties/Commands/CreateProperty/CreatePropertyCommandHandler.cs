@@ -24,7 +24,9 @@ namespace Mcm.Property.Application.Features.Properties.Commands.CreateProperty
                 command.Description, 
                 command.Type,
                 command.IsRequired,
-                command.IsMultiple);
+                command.IsMultiple,
+                false,
+                command.IsSensitive);
                 
             var exist = await _propertyRepository.Validate( 
                 p => p.CategoryId == property.CategoryId && p.Name.Value.Equals(property.Name.Value));

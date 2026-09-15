@@ -16,14 +16,14 @@ namespace Mcm.Interactions.Infrastructure.Database
         private readonly IMediator _mediator = mediator;
         private Guid? TenantId => _tenantProvider.GetTenantId();
 
-        public DbSet<Interaction> Interactions { get; set; }
-        public DbSet<InteractionMember> InteractionMembers { get; set; }
-        public DbSet<InteractionContact> InteractionContacts { get; set; }
-        public DbSet<InteractionType> InteractionTypes { get; set; }
-        public DbSet<Report> Reports { get; set; }
-        public DbSet<ReportMember> ReportMembers { get; set; }
-        public DbSet<ReportContact> ReportContacts { get; set; }
-        public DbSet<TypeField> TypeFields { get; set; }
+        public DbSet<Interaction> Interactions => Set<Interaction>();
+        public DbSet<InteractionMember> InteractionMembers => Set<InteractionMember>();
+        public DbSet<InteractionContact> InteractionContacts => Set<InteractionContact>();
+        public DbSet<InteractionType> InteractionTypes => Set<InteractionType>();
+        public DbSet<Report> Reports => Set<Report>();
+        public DbSet<ReportMember> ReportMembers => Set<ReportMember>();
+        public DbSet<ReportContact> ReportContacts => Set<ReportContact>();
+        public DbSet<TypeField> TypeFields => Set<TypeField>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,19 +64,15 @@ namespace Mcm.Interactions.Infrastructure.Database
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)
                     entry.Entity.TenantId = TenantId.Value;
             }
 
+            var result = await base.SaveChangesAsync(cancellationToken);
             await _mediator.DispatchDomainEventAsync(this);
-            return await base.SaveChangesAsync(cancellationToken);
+            return result;
         }
     }
 }

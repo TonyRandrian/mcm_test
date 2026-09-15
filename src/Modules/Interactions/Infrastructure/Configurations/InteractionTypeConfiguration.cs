@@ -22,8 +22,8 @@ public class InteractionTypeConfiguration : IEntityTypeConfiguration<Interaction
             .HasForeignKey(tf => tf.InteractionTypeId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(c => c.Fields)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(c => c.Fields)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

@@ -4,9 +4,13 @@ using Mcm.Interactions.Application.Features.Interactions.Commands.DeleteInteract
 using Mcm.Interactions.Application.Features.Interactions.Commands.UpdateInteraction;
 using Mcm.Interactions.Application.Features.Interactions.Queries.GetAllInteraction;
 using Mcm.Interactions.Application.Features.Interactions.Queries.GetInteraction;
+using Mcm.Interactions.Application.Features.Interactions.Queries.GetInteractionAttachment;
 using Mcm.Interactions.Application.Features.Reports.Commands.CreateReport;
 using Mcm.Interactions.Application.Features.Reports.Queries.GetReport;
 using Mcm.Shared.Application.Common;
+using Mcm.Shared.Application.Interfaces;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +23,7 @@ public class InteractionController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.Interaction, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateInteractionResponse>>> Create(
         [FromForm] CreateInteractionRequest body)
@@ -29,24 +34,37 @@ public class InteractionController(IMediator mediator)
             {
                 PropertyNameCaseInsensitive = true
             });
+        var dates = JsonSerializer.Deserialize<CreateInteraction_Date>(body.Date, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        var reminder = JsonSerializer.Deserialize<CreateInteraction_Reminder>(body.Reminder, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        var participant = JsonSerializer.Deserialize<CreateInteraction_Participant>(body.Participant, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
         var res = await _mediator.Send(new CreateInteractionCommand
         {
             Title = body.Title,
             TypeId = body.TypeId,
             Note = body.Note,
-            StartDate = body.Date.StartDate,
-            EndDate = body.Date.EndDate,
-            ReminderType = body.Reminder.Type,
-            ReminderValue = body.Reminder.Value,
-            ReminderRepeat = body.Reminder.Repeat,
-            Contacts = body.Participant.Contacts,
-            TeamMembers = body.Participant.Members,
-            Informations = values
+            StartDate = dates!.StartDate,
+            EndDate = dates!.EndDate,
+            ReminderType = reminder!.Type,
+            ReminderValue = reminder.Value,
+            ReminderRepeat = reminder.Repeat,
+            TeamMembers = participant!.Members,
+            Contacts = participant.Contacts,
+            Informations = values,
+            Attachments = body.Attachments ?? []
         });
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.View_Company)] 
+    [HasAuthorization(PermModule.Interaction, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetInteractionResponse>>> GetById(        
         Guid Id)
@@ -57,7 +75,16 @@ public class InteractionController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.Interaction, PermAction.Read)]
+    [HttpGet("{Id}/attachments/{fileName}")]
+    public async Task<IActionResult> GetAttachment(Guid Id, string fileName)
+    {
+        var res = await _mediator.Send(new GetInteractionAttachmentQuery(
+            new GetInteractionAttachmentRequest(Id, fileName)));
+        return File(res.Data!.Stream, res.Data.ContentType);
+    }
+
+    [HasAuthorization(PermModule.Interaction, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateInteractionResponse>>> Update(
         Guid Id, [FromForm] UpdateInteractionRequest body)
@@ -74,6 +101,8 @@ public class InteractionController(IMediator mediator)
             ReminderRepeat = body.Reminder.Repeat,
             Contacts = body.Participant.Contacts,
             TeamMembers = body.Participant.Members,
+            Attachments = body.Attachments,
+            OldUrls = body.OldUrls
             // Informations = body.Informations
         });
         return Ok(res);
@@ -106,7 +135,7 @@ public class InteractionController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.Interaction, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteInteractionResponse>>> DeleteCompany   
         (Guid Id, [FromQuery] DeleteInteractionRequest request)
@@ -119,6 +148,7 @@ public class InteractionController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Report, PermAction.Create)]
     [HttpPost("{Id}/report")]
     public async Task<ActionResult<ApiResponse<CreateReportResponse>>> CreateReport(
         Guid Id,
@@ -139,6 +169,7 @@ public class InteractionController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Report, PermAction.Read)]
     [HttpGet("{Id}/report")]
     public async Task<ActionResult<ApiResponse<GetReportResponse>>> GetReport(
         Guid Id)

@@ -1,11 +1,6 @@
-using System.Text.Json;
-using Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetAllInteractionType;
 using Mcm.Interactions.Application.Interfaces;
 using Mcm.Interactions.Domain.Extensions;
 using Mcm.Shared.Application.Common;
-using Mcm.Shared.Application.Interfaces;
-using Mcm.Shared.Application.Modules;
-using Mcm.Shared.Application.Modules.DTOs;
 using MediatR;
 
 namespace Mcm.Interactions.Application.Features.Interactions.Queries.GetAllInteraction
@@ -19,9 +14,13 @@ namespace Mcm.Interactions.Application.Features.Interactions.Queries.GetAllInter
             GetAllInteractionQuery query, CancellationToken cancellationToken)
         {
             var interactions = await _interactionRepository.GetAllAsync(
+                includes: [
+                    i => i.Type,
+                    i => i.Report
+                ],
                 predicate: c =>
-                    (string.IsNullOrEmpty(query.Request.Search)
-                        || c.Title.Value.ToLower().Contains(query.Request.Search.ToLower())) &&
+                    (string.IsNullOrEmpty(query.Request.Search) || 
+                        c.Title.Value.ToLower().Contains(query.Request.Search.ToLower())) &&
                     (query.Request.TeamMemberId == null || c.InteractionMembers.Any(i => i.TeamMemberId == query.Request.TeamMemberId)) &&
                     (query.Request.ContactId == null || c.InteractionContacts.Any(i => i.ContactId == query.Request.ContactId)) &&
                     (query.Request.StartDateFrom == null || c.Date.StartDate >= query.Request.StartDateFrom) &&
@@ -57,7 +56,16 @@ namespace Mcm.Interactions.Application.Features.Interactions.Queries.GetAllInter
                 {
                     Page  = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _interactionRepository.CountAsync()
+                    Total = await _interactionRepository.CountAsync(
+                        predicate: c =>
+                            (string.IsNullOrEmpty(query.Request.Search) || 
+                                c.Title.Value.ToLower().Contains(query.Request.Search.ToLower())) &&
+                            (query.Request.TeamMemberId == null || c.InteractionMembers.Any(i => i.TeamMemberId == query.Request.TeamMemberId)) &&
+                            (query.Request.ContactId == null || c.InteractionContacts.Any(i => i.ContactId == query.Request.ContactId)) &&
+                            (query.Request.StartDateFrom == null || c.Date.StartDate >= query.Request.StartDateFrom) &&
+                            (query.Request.StartDateTo == null || c.Date.StartDate <= query.Request.StartDateTo) &&
+                            (query.Request.EndDateFrom == null || c.Date.EndDate >= query.Request.EndDateFrom) &&
+                            (query.Request.EndDateTo == null || c.Date.EndDate <= query.Request.EndDateTo))
                 }
             };
         }

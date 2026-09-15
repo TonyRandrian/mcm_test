@@ -55,4 +55,6 @@ nunit-*.xml
 
 src/API/appsettings.Development.json
 src/API/assets/
-/.vs
+
+secrets/
+docker-compose.yml

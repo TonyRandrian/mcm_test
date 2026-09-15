@@ -10,6 +10,6 @@ namespace Mcm.Authorizations.Application.Features.Roles.Commands.CreateRole
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public List<Guid> Companies { get; set; } = [];
-        public IEnumerable<(string Module, string Action)> Permissions { get; set; } = [];
+        public IEnumerable<CreateRole_Permission> Permissions { get; set; } = [];
     }
 }

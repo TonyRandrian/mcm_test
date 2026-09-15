@@ -1,9 +1,10 @@
+using Mcm.Catalog.Domain.Events;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 
 namespace Mcm.Catalog.Domain.Entities;
 
-public class ServiceCategory : AuditableEntity, ITenantScoped
+public class ServiceCategory : AggregateRoot, ITenantScoped
 {
     public string Name { get; set; } = string.Empty;
     public Guid TenantId { get; set; }
@@ -20,12 +21,23 @@ public class ServiceCategory : AuditableEntity, ITenantScoped
     }
 
     public static ServiceCategory Create(Guid? parentId, string name)
-        => new(parentId, name);
+    {
+        ServiceCategory category = new(parentId, name);
+        category.RaiseDomainEvent(new ServiceCategoryCreatedEvent(category.Id, category.Name));
+        return category;
+    }
 
     public void Update(string name)
     {
         Name = name;
         SetUpdatedAt();
+        RaiseDomainEvent(new ServiceCategoryUpdatedEvent(Id, Name));
+    }
+
+    public override void Delete()
+    {
+        base.Delete();
+        RaiseDomainEvent(new ServiceCategoryDeletedEvent(Id, Name));
     }
 
 }

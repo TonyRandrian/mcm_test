@@ -13,8 +13,8 @@ namespace Mcm.Interactions.Domain.ValueObjects
         private DataTime(){}
         private DataTime(string startDate, string endDate)
         {
-            StartDate = DateTime.Parse(startDate).ToUniversalTime();
-            EndDate = DateTime.Parse(endDate).ToUniversalTime();
+            StartDate = DateTimeOffset.Parse(startDate).UtcDateTime;
+            EndDate = DateTimeOffset.Parse(endDate).UtcDateTime;
             if (StartDate > EndDate)
             {
                 throw new DomainException("EndDate Must be greater than StartDate");

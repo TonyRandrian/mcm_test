@@ -107,6 +107,55 @@ namespace Mcm.Property.Infrastructure.Migrations
                     b.ToTable("category_entity", "properties");
                 });
 
+            modelBuilder.Entity("Mcm.Property.Domain.Entities.CategorySetting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVisibleInProfile")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("TenantId", "CategoryId", "EntityType")
+                        .IsUnique();
+
+                    b.ToTable("category_profile_setting", "properties");
+                });
+
             modelBuilder.Entity("Mcm.Property.Domain.Entities.Property", b =>
                 {
                     b.Property<Guid>("Id")
@@ -138,6 +187,9 @@ namespace Mcm.Property.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSensitive")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsSystem")
@@ -191,6 +243,17 @@ namespace Mcm.Property.Infrastructure.Migrations
                 {
                     b.HasOne("Mcm.Property.Domain.Entities.Category", "Category")
                         .WithMany("Entities")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Mcm.Property.Domain.Entities.CategorySetting", b =>
+                {
+                    b.HasOne("Mcm.Property.Domain.Entities.Category", "Category")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

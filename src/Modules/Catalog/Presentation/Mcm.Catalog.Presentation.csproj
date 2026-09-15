@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Infrastructure\Mcm.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\Application\Mcm.Catalog.Application.csproj" />
   </ItemGroup>
 

@@ -49,7 +49,7 @@ namespace Mcm.Authorizations.Domain.Entities
         {
             InvitationToken = token;
             SetUpdatedAt();
-            RaiseDomainEvent(new TeamMemberInvited(Id, Identity, CompanyId, token));
+            RaiseDomainEvent(new TeamMemberInvitedEvent(Id, Identity, CompanyId, token));
         }
 
         public void InvitationAccepted()

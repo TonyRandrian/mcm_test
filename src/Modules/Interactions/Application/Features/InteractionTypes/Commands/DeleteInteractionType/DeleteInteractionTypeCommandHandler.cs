@@ -9,17 +9,26 @@ namespace Mcm.Interactions.Application.Features.InteractionTypes.Commands.Delete
 {
     public class DeleteInteractionTypeCommandHandler(
         IInteractionTypeRepository typeRepository, 
+        IInteractionRepository interactionRepository, 
         IInteractionUow uow)
         : IRequestHandler<DeleteInteractionTypeCommand, ApiResponse<DeleteInteractionTypeResponse>>
     {
         private readonly IInteractionTypeRepository _interactionTypeRepository = typeRepository;
+        private readonly IInteractionRepository _interactionRepository = interactionRepository;
         private readonly IInteractionUow _uow = uow;
 
         public async Task<ApiResponse<DeleteInteractionTypeResponse>> Handle(DeleteInteractionTypeCommand command, CancellationToken ct)
         {
             var type = await _interactionTypeRepository.GetByIdAsync(command.Id)
                 ?? throw NotFoundException.NotFoundById(nameof(InteractionType), command.Id);
-            
+
+            var interactions = await _interactionRepository.GetAllAsync(
+                predicate: i =>
+                    i.TypeId == type.Id,
+                ct: ct);
+            if (interactions.Any())
+                throw new BadRequestException("Has interaction saved in type");
+
             if (command.Force)
                 _interactionTypeRepository.HardDelete(type);
             else

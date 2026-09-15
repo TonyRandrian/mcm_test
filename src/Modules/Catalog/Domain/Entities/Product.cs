@@ -1,3 +1,4 @@
+using Mcm.Catalog.Domain.Events;
 using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Extensions;
 using Mcm.Shared.Domain.Interfaces;
@@ -49,7 +50,9 @@ namespace Mcm.Catalog.Domain.Entities
 
         public static Product Create(Guid companyId, string name, string description, decimal price, string unit, Guid currencyId)
         {
-            return new Product(companyId, name, description, price, unit, currencyId);
+            Product product = new(companyId, name, description, price, unit, currencyId);
+            product.RaiseDomainEvent(new ProductCreatedEvent(product.Id, product.Name));
+            return product;
         }
 
         public void Update(string name, string description, decimal price, string unit, Guid currencyId)
@@ -59,6 +62,13 @@ namespace Mcm.Catalog.Domain.Entities
             Price = price;
             Unit = unit;
             ChangeCurrency(currencyId);
+            RaiseDomainEvent(new ProductUpdatedEvent(Id, Name));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new ProductDeletedEvent(Id, Name));
         }
 
         public void ChangeCurrency(Guid currencyId)

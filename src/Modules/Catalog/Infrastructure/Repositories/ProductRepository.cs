@@ -12,5 +12,13 @@ namespace Mcm.Catalog.Infrastructure.Repositories
     public class ProductRepository(CatalogDbContext context)
         : GenericRepository<Product>(context), IProductRepository
     {
+        public override Task<Product?> GetByIdAsync(Guid id)
+        {
+            IQueryable<Product> query = _dbSet
+                .Include(p => p.Currency)
+                .Include(p => p.CategoryRelations)
+                .ThenInclude(cr => cr.Category);
+            return query.FirstOrDefaultAsync(p => p.Id == id);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Mcm.Company.Application.Interfaces;
+using Mcm.Property.Domain.Enums;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
@@ -31,6 +32,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyById
                 .ToList();
 
             var categories = await _categoryModule.GetAllAsync(propertyIds);
+            var visibleCategories = await _categoryModule.GetVisibleCategoryIdsAsync(EntityType.Company);
             var propertyMap = categories
             .SelectMany(category => category.Properties.Select(info => new
             {
@@ -51,9 +53,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyById
             .GroupBy(value =>
             {
                 if (!propertyMap.TryGetValue(value.PropertyId, out var property))
-                {
                     throw new NotFoundException("Property not found");
-                }
 
                 return new
                 {
@@ -65,6 +65,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyById
             (
                 CategoryId: group.Key.CategoryId,
                 CategoryName: group.Key.CategoryName,
+                IsVisible: visibleCategories.Contains(group.Key.CategoryId),
                 Informations: group.Select(value =>
                 {
                     var property = propertyMap[value.PropertyId];
@@ -73,6 +74,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyById
                     (
                         PropertyId: property.Property.Id,
                         PropertyName: property.Property.Name,
+                        IsSensitive: property.Property.IsSensitive,
                         Value: value.Data
                     );
                 })

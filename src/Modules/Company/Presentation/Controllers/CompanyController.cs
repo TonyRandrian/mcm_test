@@ -15,7 +15,6 @@ using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Company.Presentation.Controllers;
@@ -27,6 +26,7 @@ public class CompanyController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.Company, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateCompanyResponse>>> Create
         ([FromForm] CreateCompanyRequest body)
@@ -47,21 +47,20 @@ public class CompanyController(IMediator mediator)
             ParentId = body.ParentId,
             TypeContactId = body.TypeContactId,
             ActivitySectors = body.ActivitySectors,
-            Values = values
+            Values = values,
+            LeaderId = body.LeaderId
         });
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.View_Company)]  
     [HttpGet("me")]
-    public async Task<ActionResult<ApiResponse<GetCompanyByTokenResponse>>> GetCurrent(
-        [FromHeader] GetCompanyByTokenRequest header)
+    public async Task<ActionResult<ApiResponse<GetCompanyByTokenResponse>>> GetCurrent()
     {
-        var res = await _mediator.Send(new GetCompanyByTokenQuery(header));
+        var res = await _mediator.Send(new GetCompanyByTokenQuery());
         return Ok(res);
     }
 
-
+    [HasAuthorization(PermModule.Company, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetCompanyByIdResponse>>> GetById(        
         Guid Id)
@@ -72,7 +71,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.Company, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateCompanyResponse>>> Update(
         Guid Id, [FromForm] UpdateCompanyRequest body)
@@ -97,6 +96,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Read)]
     [HttpGet("{Id}/subsidiary")]
     public async Task<ActionResult<ApiResponse<GetSubsidiariesByIdResponse>>> ViewSubsidiariesById
         (Guid Id, [FromQuery] GetSubsidiariesByIdRequest request)
@@ -109,6 +109,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Read)]
     [HttpGet("contacts")]
     public async Task<ActionResult<ApiResponse<GetCompanyContactsResponse>>> ViewCompanyContacts
         ([FromQuery] GetCompanyContactsRequest request)
@@ -117,6 +118,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Update)]
     [HttpPost("{Id}/convertType")]
     public async Task<ActionResult<ApiResponse<ConvertTypeContactResponse>>> ConvertType(
         Guid Id)
@@ -128,7 +130,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.Company, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteCompanyResponse>>> DeleteCompany   
         (Guid Id, [FromQuery] DeleteCompanyRequest request)
@@ -141,6 +143,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Create)]
     [HttpPost("{Id}/values")]
     public async Task<ActionResult<ApiResponse<AddCompanyValueResponse>>> AddCompanyValue(
         Guid Id, [FromBody] AddCompanyValueRequestBody body)
@@ -153,6 +156,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Update)]
     [HttpPut("{Id}/values")]
     public async Task<ActionResult<ApiResponse<UpdateCompanyValueResponse>>> UpdateCompanyValue(
         Guid Id, [FromBody] List<UpdateCompanyValueRequest> body)
@@ -165,6 +169,7 @@ public class CompanyController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Company, PermAction.Update)]
     [HttpPost("{Id}/leader")]
     public async Task<ActionResult<ApiResponse<DefineCompanyLeaderResponse>>> DefineLeader(
         Guid Id, [FromBody] DefineCompanyLeaderRequest body)

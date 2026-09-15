@@ -1,10 +1,7 @@
 using Mcm.Company.Application.Interfaces;
 using Mcm.Shared.Application.Common;
-using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
-using Mcm.Shared.Domain.ValueObjects;
 using MediatR;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyContacts
 {
@@ -19,10 +16,10 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyContacts
         {
             var id = _currentUserService.CompanyId;
             var companies = await _companyRepository.GetAllAsync(
-                predicate: (e =>
-                    e.IsContact),
-                orderBy: (e => e.OrderByDescending(e => e.CreatedAt)),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit)
+                predicate: e => e.IsContact,
+                orderBy: e => e.OrderByDescending(e => e.CreatedAt),
+                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit),
+                ct: cancellationToken
             );
 
             return new ApiResponse<GetCompanyContactsResponse>
@@ -30,8 +27,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyContacts
                 Success = true,
                 Message = "Company contacts retrieved successfully",
                 Code = 200,
-                Data = new GetCompanyContactsResponse(companies.Select(company => new CompanyContactDto
-
+                Data = new GetCompanyContactsResponse([.. companies.Select(company => new CompanyContactDto
                 {
                     Id = company.Id,
                     Name = company.Name,
@@ -39,9 +35,14 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyContacts
                     Description = company.Description,
                     Logo = company.Logo,
                     CreatedAt = company.CreatedAt
-                }).ToList())
+                })]),
+                Meta = new Meta
+                {
+                    Page = query.Request.Page,
+                    Limit = query.Request.Limit,
+                    Total = await _companyRepository.CountAsync(predicate: e => e.IsContact)
+                }
             };
-
         }
     }
 }

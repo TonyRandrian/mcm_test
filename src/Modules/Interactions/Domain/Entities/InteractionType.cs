@@ -1,3 +1,4 @@
+using Mcm.Interactions.Domain.Events;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 using Mcm.Shared.Domain.ValueObjects;
@@ -26,13 +27,24 @@ namespace Mcm.Interactions.Domain.Entities
         }
 
         public static InteractionType Create(string title, string labelColor, string? description, Guid? parentId)
-            => new(title, labelColor, description, parentId);
+        {
+            InteractionType type = new(title, labelColor, description, parentId);
+            type.RaiseDomainEvent(new InteractionTypeCreatedEvent(type.Id, type.Title));
+            return type;
+        }
 
         public void Update(string title, string labelColor, string? description)
         {
             Title = title;
             LabelColor = labelColor;
             Description = description;
+            RaiseDomainEvent(new InteractionTypeUpdatedEvent(Id, Title));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new InteractionTypeDeletedEvent(Id, Title));
         }
     }
 }

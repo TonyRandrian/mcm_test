@@ -2,13 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Mcm.Shared.Infrastructure.Autorisations
 {
-    public class AuthorizationRequirement : IAuthorizationRequirement
+    public class AuthorizationRequirement(
+        string permission)
+        : IAuthorizationRequirement
     {
-
-        public AuthorizationRequirement(string permission)
-        {
-            Permission = permission;
-        }
-        public string Permission { get; }
+        public string Permission { get; } = permission;
     }
 }

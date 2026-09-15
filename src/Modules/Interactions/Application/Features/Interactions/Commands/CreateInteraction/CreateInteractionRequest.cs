@@ -9,11 +9,11 @@ namespace Mcm.Interactions.Application.Features.Interactions.Commands.CreateInte
         string Title,
         Guid TypeId,
         string? Note,
-        CreateInteraction_Date Date,
-        CreateInteraction_Reminder Reminder,
-        CreateInteraction_Participant Participant,
+        string Date,
+        string Reminder,
+        string Participant,
         string? Informations,
-        List<IFormFile> Attachments
+        List<IFormFile>? Attachments = null
     );
 
     public record CreateInteraction_Date(string StartDate, string EndDate);

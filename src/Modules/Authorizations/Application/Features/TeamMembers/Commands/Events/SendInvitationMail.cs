@@ -11,11 +11,11 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Commands.Events
     public class SendInvitationMail(
         ICompanyModule companyModule,
         IMailService mailService)
-        : INotificationHandler<TeamMemberInvited>
+        : INotificationHandler<TeamMemberInvitedEvent>
     {
         private readonly ICompanyModule _companyModule = companyModule;
         private readonly IMailService _mailService = mailService;
-        public async Task Handle(TeamMemberInvited notification, CancellationToken cancellationToken)
+        public async Task Handle(TeamMemberInvitedEvent notification, CancellationToken cancellationToken)
         {
             var company = await _companyModule.GetCompanyById(notification.CompanyId)
                 ?? throw NotFoundException.NotFoundById("Company", notification.CompanyId);

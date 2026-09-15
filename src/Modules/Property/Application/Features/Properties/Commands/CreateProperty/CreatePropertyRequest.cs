@@ -8,6 +8,7 @@ namespace Mcm.Property.Application.Features.Properties.Commands.CreateProperty
         string? Description,
         string Type,
         bool IsRequired,
-        bool IsMultiple
+        bool IsMultiple,
+        bool IsSensitive
     );
 }

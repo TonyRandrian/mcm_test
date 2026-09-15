@@ -19,6 +19,7 @@ namespace Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetAllI
         {
             var types = await _interactionTypeRepository.GetAllAsync(
                 predicate: c =>
+                    c.ParentId == null &&
                     (string.IsNullOrEmpty(query.Request.Search)
                         || c.Title.Value.ToLower().Contains(query.Request.Search.ToLower())),
                 orderBy: q => q.OrderByDescending(c => c.CreatedAt),
@@ -31,7 +32,8 @@ namespace Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetAllI
                 Message = "InteractionTypes retrieved successfully",
                 Code = 200,
                 Data = types.Select(t =>
-                    new GetAllInteractionTypeResponse{
+                    new GetAllInteractionTypeResponse
+                    {
                         Id = t.Id,
                         Title = t.Title,
                         LabelColor = t.LabelColor
@@ -40,7 +42,11 @@ namespace Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetAllI
                 {
                     Page  = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _interactionTypeRepository.CountAsync()
+                    Total = await _interactionTypeRepository.CountAsync(
+                        predicate: c =>
+                            c.ParentId == null &&
+                            (string.IsNullOrEmpty(query.Request.Search)
+                                || c.Title.Value.ToLower().Contains(query.Request.Search.ToLower())))
                 }
             };
         }

@@ -16,7 +16,7 @@ namespace Mcm.Shared.Application.Services
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
         public Guid TenantId => GetGuidClaim("tenant_id");
-        public Guid TeamMemberId => GetGuidClaim(JwtRegisteredClaimNames.Aud);
+        public Guid TeamMemberId => GetGuidClaim("team_member_id");
         public Guid CompanyId => GetGuidClaim(JwtRegisteredClaimNames.Sub);
 
         private Guid GetGuidClaim(string claimType)
@@ -41,17 +41,25 @@ namespace Mcm.Shared.Application.Services
 
     private string? GetToken()
     {
-        var authorization = _httpContext.HttpContext?
+        var authHeader = _httpContext.HttpContext?
             .Request.Headers[TokenStringHeader]
             .ToString();
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+            return authHeader["Bearer ".Length..];
 
-        if (string.IsNullOrWhiteSpace(authorization))
-            return null;
+        var accessToken = _httpContext.HttpContext?
+            .Request.Query["access_token"]
+            .ToString();
+        if (!string.IsNullOrEmpty(accessToken))
+            return accessToken;
 
-        if (!authorization.StartsWith("Bearer "))
-            return null;
+        var queryAuth = _httpContext.HttpContext?
+            .Request.Query["Authorization"]
+            .ToString();
+        if (!string.IsNullOrEmpty(queryAuth))
+            return queryAuth.Replace("Bearer ", "").Trim();
 
-        return authorization["Bearer ".Length..];
+        return null;
     }
 
         // public string GetTokenString()

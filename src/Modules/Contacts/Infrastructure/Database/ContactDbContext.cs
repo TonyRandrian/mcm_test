@@ -15,7 +15,7 @@ namespace Mcm.Contacts.Infrastructure.Database
         private readonly ITenantProvider _tenantProvider = tenantProvider;
         private readonly IMediator _mediator = mediator;
         private Guid? TenantId => _tenantProvider.GetTenantId();
-        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Contact> Contacts => Set<Contact>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,26 +26,21 @@ namespace Mcm.Contacts.Infrastructure.Database
                         .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
 
             modelBuilder.ApplyConfiguration(new ContactConfiguration());
-            // modelBuilder.ApplyConfiguration(new ContactValueConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)
                     entry.Entity.TenantId = TenantId.Value;
             }
 
+            var result = await base.SaveChangesAsync(cancellationToken);
             await _mediator.DispatchDomainEventAsync(this);
-            return await base.SaveChangesAsync(cancellationToken);
+            return result;
         }
     }
 }

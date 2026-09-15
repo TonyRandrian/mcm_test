@@ -19,10 +19,10 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Commands.Invitatio
         {
             var objectToken = _jwtTokenService.VerifyToken(command.AccessToken);
             var teamMember = await _teamMemberRepository.GetByIdOutTenantAsync(objectToken.TeamMemberId)
-                        ?? throw NotFoundException.NotFoundById(nameof(Authorizations.Domain.Entities.TeamMember), objectToken.TeamMemberId);
+                ?? throw NotFoundException.NotFoundById(nameof(Domain.Entities.TeamMember), objectToken.TeamMemberId);
             
             teamMember.Update(
-                new Identity(command.LastName, command.FirstName, command.Email, string.Empty));
+                new Identity(command.LastName, command.FirstName, teamMember.Identity.Email, string.Empty));
             teamMember.SetPassword(_passwordService.HashPassword(command.Password));
             teamMember.InvitationAccepted();
             

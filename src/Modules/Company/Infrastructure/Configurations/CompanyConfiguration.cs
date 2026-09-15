@@ -58,14 +58,14 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Domain.Entities.Com
                 .IsRequired();
         });
         
-        builder.Navigation(c => c.CompanyActivities)
-            .HasField("_companyActivities")
-            .AutoInclude();
-        builder.Navigation(c => c.TypeContact)
-            .AutoInclude();
-        builder.Navigation(c => c.SupplValues)
-            .AutoInclude();
-        builder.Navigation(c => c.Logo)
-            .AutoInclude();
+        // builder.Navigation(c => c.CompanyActivities)
+        //     .HasField("_companyActivities")
+        //     .AutoInclude();
+        // builder.Navigation(c => c.TypeContact)
+        //     .AutoInclude();
+        // builder.Navigation(c => c.SupplValues)
+        //     .AutoInclude();
+        // builder.Navigation(c => c.Logo)
+        //     .AutoInclude();
     }
 }

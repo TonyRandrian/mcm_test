@@ -1,4 +1,5 @@
 using Mcm.Property.Domain.Enums;
+using Mcm.Property.Domain.Events;
 using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Extensions;
 using Mcm.Shared.Domain.Interfaces;
@@ -7,7 +8,8 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Property.Domain.Entities
 {
-    public class Category : AggregateRoot, ITenantScoped
+    public class Category
+        : AggregateRoot, ITenantScoped
     {
         public Name Name { get; private set; } = null!;
         public string? Description 
@@ -33,7 +35,11 @@ namespace Mcm.Property.Domain.Entities
         }
 
         public static Category Create(string name, string? description = null, bool isSystem = false)
-             => new(name, description, isSystem);
+        {
+            Category category = new(name, description, isSystem);
+            category.RaiseDomainEvent(new CategoryCreatedEvent(category.Id, category.Name));
+            return category;
+        }
 
         public void Update(string? name, string? description)
         {
@@ -42,6 +48,13 @@ namespace Mcm.Property.Domain.Entities
             if (description is not null)
                 ChangeDetail(description);
             SetUpdatedAt();
+            RaiseDomainEvent(new CategoryUpdatedEvent(Id, Name));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new CategoryDeletedEvent(Id, Name));
         }
 
         public void AddProperty(Property property)

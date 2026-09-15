@@ -1,14 +1,13 @@
-using Mcm.Authorizations.Application.Features.Auth.Login;
-using Mcm.Authorizations.Application.Features.Auth.LoginForgettenPwd;
 using Mcm.Authorizations.Application.Features.Password.ForgetPassword;
 using Mcm.Shared.Application.Common;
 using MediatR;
-using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Mcm.Company.Presentation.Controllers
+namespace Mcm.Authorizations.Presentation.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("api")]
     public class PasswordController(IMediator mediator)
         : ControllerBase

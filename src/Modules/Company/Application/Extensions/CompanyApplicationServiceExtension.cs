@@ -1,4 +1,5 @@
 using System.Reflection;
+using Mcm.Company.Application.Features.Dashboard;
 using Mcm.Company.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ namespace Mcm.Company.Application.Extensions
             services.AddMediatR(cfg => 
                 cfg.RegisterServicesFromAssembly(assembly)
             );
+
+            services.AddScoped<ICompanyDashboardService, CompanyDashboardService>();
 
             return services;
         }

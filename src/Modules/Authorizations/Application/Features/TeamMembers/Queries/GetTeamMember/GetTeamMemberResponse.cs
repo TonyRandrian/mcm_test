@@ -30,6 +30,7 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetTeamMem
     {
         public Guid PropertyId { get; set; }
         public string PropertyName { get; set; } = string.Empty;
+        public bool IsSensitive { get; set; }
         public string Value { get; set; } = string.Empty;
     }
 

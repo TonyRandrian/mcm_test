@@ -3,6 +3,6 @@ using MediatR;
 
 namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
 {
-    public record GetCompanyByTokenQuery(GetCompanyByTokenRequest Request)
+    public record GetCompanyByTokenQuery()
         : IRequest<ApiResponse<GetCompanyByTokenResponse>>;
 }

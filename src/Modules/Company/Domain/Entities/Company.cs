@@ -1,3 +1,4 @@
+using Mcm.Company.Domain.Events;
 using Mcm.Property.Domain.Enums;
 using Mcm.Shared.Domain.Events;
 using Mcm.Shared.Domain.Exceptions;
@@ -8,7 +9,8 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Company.Domain.Entities
 {
-    public class Company : AggregateRoot, ITenantScoped
+    public class Company
+        : AggregateRoot, ITenantScoped
     {
         public Name Name { get; private set; } = null!;
         public string Acronym
@@ -52,13 +54,34 @@ namespace Mcm.Company.Domain.Entities
         }
 
         public static Company Create(string name, string acronym, string description, Guid? parentId = null, bool isContact = false, Guid? leaderId = null, Guid? typeContactId = null, Guid? companyId = null)
-            => new(name, acronym, description, parentId, isContact, leaderId, typeContactId, companyId);
+        {
+            Company company = new(
+                name, 
+                acronym, 
+                description, 
+                parentId, 
+                isContact, 
+                leaderId, 
+                typeContactId,
+                companyId);
+            if (company.ParentId is not null && !company.IsContact)
+                company.RaiseDomainEvent(new SubsidiaryCreatedEvent(company.Id, company.Name));
+            if (company.IsContact)
+                company.RaiseDomainEvent(new CompanyContactCreatedEvent(company.Id, company.Name));
+            return company;
+        }
 
         public void Update(string? name, string? acronym, string? description)
         {
             if (name is not null) Name = name;
             if (acronym is not null) Acronym = acronym;
             if (description is not null) Description = description;
+            if (Parent is null)
+                RaiseDomainEvent(new CompanyUpdatedEvent(Id, Name));
+            if (Parent is not null && !IsContact)
+                RaiseDomainEvent(new SubsidiaryUpdatedEvent(Id, Name));
+            if (IsContact)
+                RaiseDomainEvent(new CompanyContactUpdatedEvent(Id, Name));
         }
 
         public void ConvertTypeContact()
@@ -66,6 +89,8 @@ namespace Mcm.Company.Domain.Entities
             if (TypeContact?.TypeConvertTo is null)
                 return;
             TypeContactId = TypeContact.TypeConvertTo;
+            SetUpdatedAt();
+            RaiseDomainEvent(new CompanyContactUpdatedEvent(Id, Name));
         }
 
         public void UpdateLogo(Resource logo)
@@ -75,16 +100,42 @@ namespace Mcm.Company.Domain.Entities
 
         public void UpdateLeader(Guid leaderId)
         {
+            if (ParentId is not null)
+                RaiseDomainEvent(new LeaderDefinedEvent(leaderId, Id, Name.Value));
             LeaderId = leaderId;
         }
         
-        public void AddValue(string data, Guid propertyId, bool isMultiple = false)
+        public void AddValue(string data, Guid propertyId, bool isMultiple, bool isSensitive)
         {
             if (_values.Any(v => v.PropertyId == propertyId && !isMultiple))
                 return;
             
-            var value = CompanyValue.Create(Id, propertyId, data, TenantId);
+            var value = CompanyValue.Create(
+                Id, 
+                propertyId, 
+                isSensitive ? data.SetSensitive() : data, 
+                TenantId);
             _values.Add(value);
+        }
+
+        public void AddMultipleValue(List<(string data, Guid propertyId, bool isMultiple, bool isSensitive)> values)
+        {
+            var hashValues = values.ToHashSet();
+            List<CompanyValue> companyValues = [];
+            foreach (var (data, propertyId, isMultiple, isSensitive) in values)
+            {
+                if (_values.Any(v => v.PropertyId == propertyId && !isMultiple))
+                    continue;
+                
+                companyValues.Add(CompanyValue.Create(
+                    Id, 
+                    propertyId, 
+                    isSensitive
+                        ? data.SetSensitive()
+                        : data,
+                    TenantId));
+            }
+            _values.AddRange(companyValues);
         }
 
         public void UpdateValue(string data, Guid propertyId)
@@ -137,8 +188,28 @@ namespace Mcm.Company.Domain.Entities
         public override void Delete()
         {
             base.Delete();
-            RaiseDomainEvent(new CompanyDeletedEvent(Id));
-            // RaiseDomainEvent(new CompanyDeletedEvent)
+            if (ParentId is null)
+                RaiseDomainEvent(new CompanyDeletedEvent(Id, Name));
+            if (ParentId is not null && !IsContact)
+                RaiseDomainEvent(new SubsidiaryDeletedEvent(Id, Name));
+            if (IsContact)
+                RaiseDomainEvent(new CompanyContactDeletedEvent(Id, Name));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is not null
+                && obj is Company other
+                && Name.Equals(other.Name)
+                && Acronym.Equals(other.Acronym)
+                && Description.Equals(other.Description)
+                && ParentId == other.ParentId
+                && IsContact == other.IsContact;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, Acronym, Description, ParentId, IsContact);
         }
     }
 }

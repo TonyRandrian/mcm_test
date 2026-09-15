@@ -4,6 +4,8 @@ using Mcm.Catalog.Application.Features.ProductCategories.Commands.UpdateProductC
 using Mcm.Catalog.Application.Features.ProductCategories.Queries.GetAllProductCategory;
 using Mcm.Catalog.Application.Features.ProductCategories.Queries.GetProductCategory;
 using Mcm.Shared.Application.Common;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +26,7 @@ public class ProductCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ProductCategory, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetProductCategoryResponse>>> GetById(
         Guid Id)
@@ -33,6 +36,7 @@ public class ProductCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ProductCategory, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateProductCategoryResponse>>> Create(
         [FromBody] CreateProductCategoryRequest body)
@@ -45,6 +49,7 @@ public class ProductCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ProductCategory, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateProductCategoryResponse>>> Update(
         Guid Id,
@@ -58,6 +63,7 @@ public class ProductCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ProductCategory, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteProductCategoryResponse>>> Delete(
         Guid Id,

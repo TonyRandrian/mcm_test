@@ -1,5 +1,6 @@
 using Mcm.Authorizations.Application.Interfaces;
 using Mcm.Authorizations.Domain.Entities;
+using Mcm.Authorizations.Domain.Extensions;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
@@ -37,9 +38,9 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Commands.InviteTea
             }
             else if (! await _companyModule.HasLeader(company.Id))
             {
-                role = Role.Create("Dirigeant", $"Role dirigeant de l'entreprise {company.Name}");
+                role = Role.Create("Dirigeant", $"Role dirigeant de l'entreprise {company.Name}", true);
+                role.AddManyPermission(LeaderPermission.GetValues());
                 role.AddCompany(company.Id);
-                // TO DO: definir permission
                 await _roleRepository.AddAsync(role);
             }
             else

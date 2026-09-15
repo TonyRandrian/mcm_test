@@ -23,7 +23,6 @@ namespace Mcm.Interactions.Application.Features.InteractionTypes.Queries.GetInte
             var subtypes = await _interactionTypeRepository.GetAllAsync(
                 predicate: it => it.ParentId == type.Id, 
                 ct: cancellationToken);
-            System.Console.WriteLine(JsonSerializer.Serialize(subtypes));
 
             return new ApiResponse<GetInteractionTypeResponse>
             {

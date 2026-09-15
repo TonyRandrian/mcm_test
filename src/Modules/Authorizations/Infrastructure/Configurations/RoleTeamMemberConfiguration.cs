@@ -15,6 +15,5 @@ public class RoleTeamMemberConfiguration : IEntityTypeConfiguration<RoleTeamMemb
 
         builder.Navigation(tm => tm.Role)
             .AutoInclude();
-
     }
 }

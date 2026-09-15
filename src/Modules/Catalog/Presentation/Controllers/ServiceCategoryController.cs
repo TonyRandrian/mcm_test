@@ -4,6 +4,8 @@ using Mcm.Catalog.Application.Features.ServiceCategories.Commands.UpdateServiceC
 using Mcm.Catalog.Application.Features.ServiceCategories.Queries.GetAllServiceCategory;
 using Mcm.Catalog.Application.Features.ServiceCategories.Queries.GetServiceCategory;
 using Mcm.Shared.Application.Common;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +26,7 @@ public class ServiceCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ServiceCategory, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetServiceCategoryResponse>>> GetById(
         Guid Id)
@@ -33,6 +36,7 @@ public class ServiceCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ServiceCategory, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateServiceCategoryResponse>>> Create(
         [FromBody] CreateServiceCategoryRequest body)
@@ -45,6 +49,7 @@ public class ServiceCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ServiceCategory, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateServiceCategoryResponse>>> Update(
         Guid Id,
@@ -58,6 +63,7 @@ public class ServiceCategoryController(IMediator mediator)
         return Ok(result);
     }
 
+    [HasAuthorization(PermModule.ServiceCategory, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteServiceCategoryResponse>>> Delete(
         Guid Id,

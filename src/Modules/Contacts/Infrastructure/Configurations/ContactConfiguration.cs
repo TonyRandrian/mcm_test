@@ -60,12 +60,12 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
             img.Property(i => i.StorageType).HasColumnName("image_storage_type");
         });
 
-        builder.Navigation(c => c.Values)
-            .HasField("_values")
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.Navigation(c => c.Identity)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(c => c.Values)
+        //     .HasField("_values")
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(c => c.Identity)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -15,10 +15,13 @@ namespace Mcm.Catalog.Application.Features.ProductCategories.Queries.GetAllProdu
         public async Task<ApiResponse<GetAllProductCategoryResponse>> Handle(GetAllProductCategoryQuery query, CancellationToken cancellationToken)
         {
             var categories = await _productCategoryRepository.GetAllAsync(
-                predicate: p => (
-                    (string.IsNullOrEmpty(query.Request.searchName) || p.Name.Contains(query.Request.searchName))),
-                orderBy: p => p.OrderDescending(),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit));
+                includes: [
+                    p => p.ProductRelations
+                ],
+                predicate: p => string.IsNullOrEmpty(query.Request.searchName) ||
+                    p.Name.ToLower().Contains(query.Request.searchName.ToLower()), 
+                orderBy: q => q.OrderBy(p => p.Name),
+                ct: cancellationToken);
             
             var tree = categories.ToDictionary(
                 x => x.Id,
@@ -41,6 +44,8 @@ namespace Mcm.Catalog.Application.Features.ProductCategories.Queries.GetAllProdu
             var data = categories
                 .Where(x => x.ParentCategoryId is null)
                 .Select(x => tree[x.Id])
+                .Skip((query.Request.Page - 1) * query.Request.Limit)
+                .Take(query.Request.Limit)
                 .ToList();
 
             return new ApiResponse<GetAllProductCategoryResponse>
@@ -53,7 +58,9 @@ namespace Mcm.Catalog.Application.Features.ProductCategories.Queries.GetAllProdu
                 {
                     Page = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _productCategoryRepository.CountAsync()
+                    Total = await _productCategoryRepository.CountAsync(
+                        predicate: p => string.IsNullOrEmpty(query.Request.searchName) ||
+                        p.Name.ToLower().Contains(query.Request.searchName.ToLower()))
                 }
             };
         }

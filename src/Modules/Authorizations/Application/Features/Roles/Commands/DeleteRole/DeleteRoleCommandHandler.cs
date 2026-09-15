@@ -18,6 +18,9 @@ namespace Mcm.Authorizations.Application.Features.Roles.Commands.DeleteRole
             var role = await _roleRepository.GetByIdAsync(command.Id)
                 ?? throw NotFoundException.NotFoundById(nameof(Role), command.Id);
             
+            if (role.IsSystem)
+                throw new UnauthorizedException("System Role cannot be deleted");
+
             if (command.Force)
                 _roleRepository.HardDelete(role);
             else 

@@ -9,5 +9,6 @@ namespace Mcm.Authorizations.Application.Interfaces
     {
         Task<TeamMember?> GetByEmailAsync(Email email);
         Task<TeamMember?> GetByIdOutTenantAsync(Guid id);
+        bool IsAuthorized(Guid teamMemberId, Guid companyId);
     }
 }

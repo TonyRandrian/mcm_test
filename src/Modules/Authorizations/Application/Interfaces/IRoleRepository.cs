@@ -6,5 +6,6 @@ namespace Mcm.Authorizations.Application.Interfaces
     public interface IRoleRepository
         : IGenericRepository<Role>
     {
+        Task<Role?> GetAdminAsync();
     }
 }

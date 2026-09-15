@@ -12,10 +12,13 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
         builder.ToTable("roles");
 
-        builder.Property(r => r.Title)
-            .HasConversion<string>(
-                name => name.Value, value => new Name(value))
-            .HasMaxLength(100);
+        builder.OwnsOne(r => r.Title, nav =>
+        {
+            nav.Property(x => x.Value)
+                .HasColumnName("title")
+                .HasMaxLength(100)
+                .IsRequired();
+        });
 
         builder.HasMany(role => role.Members)
             .WithOne(rm => rm.Role)
@@ -31,18 +34,18 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasForeignKey(rc => rc.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(role => role.Members)
-            .HasField("_members")
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.Navigation(role => role.Authorizations)
-            .HasField("_authorizations")
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.Navigation(role => role.RoleCompanies)
-            .HasField("_roleCompanies")
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(role => role.Members)
+        //     .HasField("_members")
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(role => role.Authorizations)
+        //     .HasField("_authorizations")
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(role => role.RoleCompanies)
+        //     .HasField("_roleCompanies")
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
 
     }
 }

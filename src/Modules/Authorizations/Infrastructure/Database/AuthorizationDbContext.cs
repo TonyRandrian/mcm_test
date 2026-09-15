@@ -17,13 +17,14 @@ namespace Mcm.Authorizations.Infrastructure.Database
         private readonly IMediator _mediator = mediator;
         private Guid? TenantId => _tenantProvider.GetTenantId();
 
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<RoleCompany> RoleCompanies { get; set; }
-        public DbSet<RoleTeamMember> RoleTeamMembers { get; set; }
-        public DbSet<TeamMember> TeamMembers { get; set; }
-        public DbSet<PasswordReset> PasswordResets { get; set; }
-
+        public DbSet<Role> Roles => Set<Role>();
+        public DbSet<Permission> Permissions => Set<Permission>();
+        public DbSet<RoleCompany> RoleCompanies => Set<RoleCompany>();
+        public DbSet<RoleTeamMember> RoleTeamMembers => Set<RoleTeamMember>();
+        public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<PasswordReset> PasswordResets => Set<PasswordReset>();
+        public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +33,8 @@ namespace Mcm.Authorizations.Infrastructure.Database
             modelBuilder.Entity<Role>()
                 .HasQueryFilter("MultiTenant",  e => e.TenantId == TenantId)
                 .HasQueryFilter("SoftDelete", e => !e.IsDeleted);
+            modelBuilder.Entity<ActivityLog>()
+                .HasQueryFilter("MultiTenant",  e => e.TenantId == TenantId);
             modelBuilder.Entity<RoleCompany>()
                 .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
             modelBuilder.Entity<RoleTeamMember>()
@@ -43,8 +46,10 @@ namespace Mcm.Authorizations.Infrastructure.Database
             modelBuilder.Entity<TeamMember>()
                 .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId)
                 .HasQueryFilter("SoftDelete", e => !e.IsDeleted);
+            modelBuilder.Entity<RefreshToken>();
 
             modelBuilder.ApplyConfiguration(new TeamMemberConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new PermissionConfiguration());
             modelBuilder.ApplyConfiguration(new RoleCompanyConfiguration());
@@ -55,20 +60,15 @@ namespace Mcm.Authorizations.Infrastructure.Database
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)
                     entry.Entity.TenantId = TenantId.Value;
-    
             }
             
+            var result = await base.SaveChangesAsync(cancellationToken);
             await _mediator.DispatchDomainEventAsync(this);
-            return await base.SaveChangesAsync(cancellationToken);
+            return result;
         }
     }
 }

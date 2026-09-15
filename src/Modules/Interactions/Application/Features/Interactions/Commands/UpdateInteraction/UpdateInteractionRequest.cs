@@ -11,7 +11,8 @@ namespace Mcm.Interactions.Application.Features.Interactions.Commands.UpdateInte
         UpdateInteraction_Reminder Reminder,
         UpdateInteraction_Participant Participant,
         List<IFormFile> Attachments,
-        UpdateInteraction_Information Informations
+        string Informations,
+        List<string> OldUrls
         
     );
 

@@ -11,5 +11,6 @@ public class RoleCompanyConfiguration : IEntityTypeConfiguration<RoleCompany>
     {
         builder.ToTable("role_company");
 
+        builder.HasKey(rt => new{ rt.RoleId, rt.CompanyId });
     }
 }

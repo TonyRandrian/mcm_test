@@ -7,7 +7,7 @@ namespace Mcm.Shared.Domain.Enums
         Decimal,
         Bool,
         Email,
-        Phone
+        PhoneNumber
     }
     
 }

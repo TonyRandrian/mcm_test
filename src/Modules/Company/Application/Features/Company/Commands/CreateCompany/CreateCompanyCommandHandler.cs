@@ -3,6 +3,8 @@ using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Application.Modules;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Domain.Extensions;
 using MediatR;
 
 namespace Mcm.Company.Application.Features.Company.Commands.CreateCompany
@@ -10,7 +12,7 @@ namespace Mcm.Company.Application.Features.Company.Commands.CreateCompany
     public class CreateCompanyCommandHandler(
         ICompanyRepository companyRepository, 
         IResourceService fileService, 
-        ITeamMemberModule tmModule, 
+        ITeamMemberModule tmModule,
         IPropertyModule propertyModule,
         ICurrentUserService currentUserService,
         ITypeContactRepository typeContactRepository,
@@ -35,7 +37,8 @@ namespace Mcm.Company.Application.Features.Company.Commands.CreateCompany
                 if (parent.IsContact != command.IsContact)
                     throw new BadRequestException("Check company type (Organization | Contact)");
             }
-            if (command.LeaderId is not null && (await _tmModule.Exists(command.LeaderId.Value)))
+
+            if (command.LeaderId is not null && !(await _tmModule.Exists(command.LeaderId.Value)))
                 throw new BadRequestException("Not null leaderId, not exists");
 
             Domain.Entities.TypeContact? typeContact = null;
@@ -58,24 +61,38 @@ namespace Mcm.Company.Application.Features.Company.Commands.CreateCompany
                     : null
             );
             
+            var exists = await _companyRepository.Validate(
+                c => c.Equals(company));
+            if (exists is not null)
+                throw BadRequestException.Exist(nameof(Domain.Entities.Company));
+
             if (command.Logo is not null)
-            {
-                company.UpdateLogo(
-                    await _fileService.SaveResource(command.Logo));
-            }
+                company.UpdateLogo(await _fileService.SaveResource(command.Logo, FileType.Image));
 
             company.SynchActivities(command.ActivitySectors ?? []);
         
             if (command.Values is not null)
-            {    
-                foreach (var value in command.Values)
+            {
+                var properties = await _propertyModule.GetByIdsAsync(
+                    command.Values.Select(v => v.PropertyId).ToList());
+                foreach (var v in command.Values)
                 {
-                    var property = await _propertyModule.GetByIdAsync(value.PropertyId);
-                    if (property is not null)
+                    try
                     {
-                        company.AddValue(value.Value, property.Id, property.IsMultiple);
+                        v.Value.ConvertTo(properties[v.PropertyId].Type);
+                    }
+                    catch (FormatException)
+                    {   
+                        throw;
                     }
                 }
+                company.AddMultipleValue(command.Values
+                    .Select(v => (
+                        v.Value, 
+                        v.PropertyId,
+                        properties[v.PropertyId].IsMultiple, 
+                        properties[v.PropertyId].IsSensitive))
+                    .ToList());
             }
 
             await _companyRepository.AddAsync(company);

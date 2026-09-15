@@ -10,7 +10,6 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Commands.Invitatio
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
         public string AccessToken { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }

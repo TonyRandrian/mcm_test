@@ -28,6 +28,7 @@ namespace Mcm.Contacts.Application.Features.Contacts.Queries.GetContact
     {
         public Guid PropertyId { get; set; }
         public string PropertyName { get; set; } = string.Empty;
+        public bool IsSensitive { get; set; }
         public string Value { get; set; } = string.Empty;
     }
 

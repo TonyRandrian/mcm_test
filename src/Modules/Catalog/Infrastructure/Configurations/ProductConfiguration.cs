@@ -36,14 +36,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(e => e.CurrencyId);
             // .OnDelete(DeleteBehavior.NoAction);
         
-        // builder.Navigation(e => e.CoverPicture)
+        // builder.Navigation(e => e.Currency)
         //     .AutoInclude();
-        // builder.Navigation(e => e.Images)
-        //     .AutoInclude();
-        builder.Navigation(e => e.Currency)
-            .AutoInclude();
-        builder.Navigation(e => e.CategoryRelations)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(e => e.CategoryRelations)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

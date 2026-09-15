@@ -14,15 +14,27 @@ namespace Mcm.Property.Application.Features.Categories.Queries.GetAllCategory
         
         public async Task<ApiResponse<GetAllCategoryResponse>> Handle(GetAllCategoryQuery query, CancellationToken cancellationToken)
         {
+            EntityType entityType = EntityType.Other;
+            if (query.Request.Filter is not null)
+                if (!Enum.TryParse<EntityType>(query.Request.Filter, out entityType))
+                    throw new ArgumentException("Unknown Filter CategoryEntity");
+            
             var categories = await _CategoryRepository.GetAllAsync(
-                predicate: (c => 
-                    (string.IsNullOrEmpty(query.Request.Filter)
-                        ||  c.Name.Value.ToLower().Contains(query.Request.Filter.ToLower()))
-                    ||  c.IsSystem==query.Request.SystemOnly),
-                orderBy: (c => 
-                    c.OrderDescending()),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit)
-                
+                includes: [
+                    c => c.Properties,
+                    c => c.Entities
+                ],
+                predicate: c => 
+                    (string.IsNullOrEmpty(query.Request.Filter) ||
+                        c.Entities.Any(e => e.EntityType == Enum.Parse<EntityType>(query.Request.Filter))) &&
+                    (string.IsNullOrEmpty(query.Request.SearchByName) ||
+                        c.Name.Value.ToLower().Contains(query.Request.SearchByName.ToLower())) &&
+                    query.Request.SystemOnly
+                        ? c.IsSystem
+                        : c.IsSystem | !c.IsSystem,
+                orderBy: c => c.OrderBy(c => c.Name.Value),
+                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit),
+                ct: cancellationToken
             );
             
             var data = categories.Select(res => new CategoryResponse
@@ -34,7 +46,9 @@ namespace Mcm.Property.Application.Features.Categories.Queries.GetAllCategory
                     Id = prop.Id,
                     Name = prop.Name,
                     Type = prop.Type.ToString(),
-                    IsMultiple = prop.IsMultiple
+                    IsMultiple = prop.IsMultiple,
+                    IsRequired = prop.IsRequired,
+                    IsSensitive = prop.IsSensitive
                 })]
             }).ToList();
 
@@ -51,7 +65,15 @@ namespace Mcm.Property.Application.Features.Categories.Queries.GetAllCategory
                 {
                     Page = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _CategoryRepository.CountAsync()
+                    Total = await _CategoryRepository.CountAsync(
+                        predicate: c => 
+                            (string.IsNullOrEmpty(query.Request.Filter) ||
+                                c.Entities.Any(e => e.EntityType == Enum.Parse<EntityType>(query.Request.Filter))) &&
+                            (string.IsNullOrEmpty(query.Request.SearchByName) ||
+                                c.Name.Value.ToLower().Contains(query.Request.SearchByName.ToLower())) &&
+                            query.Request.SystemOnly
+                                ? c.IsSystem
+                                : c.IsSystem | !c.IsSystem)
                 }
             };
         }

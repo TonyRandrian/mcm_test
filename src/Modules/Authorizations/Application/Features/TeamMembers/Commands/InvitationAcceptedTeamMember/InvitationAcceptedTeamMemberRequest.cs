@@ -6,7 +6,6 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Commands.Invitatio
     (
         string FirstName,
         string LastName,
-        string Email,
         string AccessToken,
         string Password
     );

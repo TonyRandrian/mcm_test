@@ -5,7 +5,6 @@ namespace Mcm.Company.Application.Interfaces
 {
     public interface IActivitySectorRepository
         : IGenericRepository<ActivitySector>
-    {
-        
+    { 
     }
 }

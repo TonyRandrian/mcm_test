@@ -9,6 +9,13 @@ namespace Mcm.Interactions.Infrastructure.Repositories
     public class InteractionTypeRepository(InteractionDbContext context)
         : GenericRepository<InteractionType>(context), IInteractionTypeRepository
     {
+        public override Task<InteractionType?> GetByIdAsync(Guid id)
+        {
+            IQueryable<InteractionType> query = _dbSet
+                .Include(t => t.Fields);
+            return query.FirstOrDefaultAsync(t => t.Id == id);
+        }
+        
         public async Task<List<Guid>> GetAncestors(Guid typeId)
         {
             List<InteractionType> ancestors = [];

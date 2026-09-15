@@ -1,7 +1,7 @@
 using System.Reflection;
+using Mcm.Authorizations.Application.Features.History.Hubs;
 using Mcm.Authorizations.Application.Interfaces;
 using Mcm.Authorizations.Application.Services;
-using Mcm.Company.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mcm.Authorizations.Application.Extensions
@@ -15,8 +15,10 @@ namespace Mcm.Authorizations.Application.Extensions
                 cfg.RegisterServicesFromAssembly(assembly)
             );
 
+            services.AddSignalR();
             services.AddScoped<IHashPasswordService, HashPasswordService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IActivityLogService, ActivityLogService>();
 
             return services;
         }

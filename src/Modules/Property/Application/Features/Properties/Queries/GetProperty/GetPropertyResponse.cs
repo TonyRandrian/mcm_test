@@ -8,5 +8,6 @@ namespace Mcm.Property.Application.Features.Properties.Queries.GetProperty
         public string? Description { get; set; }
         public bool IsRequired { get; set; }
         public bool IsMultiple { get; set; }
+        public bool IsSensitive { get; set; }
     }
 }

@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Mcm.Property.Application.csproj" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>

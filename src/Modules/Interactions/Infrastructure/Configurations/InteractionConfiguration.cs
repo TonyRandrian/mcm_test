@@ -69,15 +69,15 @@ public class InteractionConfiguration : IEntityTypeConfiguration<Interaction>
             .WithMany()
             .HasForeignKey(i => i.TypeId);
 
-        builder.Navigation(c => c.Type)
-            .AutoInclude();
-        builder.Navigation(c => c.InteractionMembers)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-        builder.Navigation(c => c.InteractionContacts)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-        builder.Navigation(i => i.Report)
-            .AutoInclude();
+        // builder.Navigation(c => c.Type)
+        //     .AutoInclude();
+        // builder.Navigation(c => c.InteractionMembers)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(c => c.InteractionContacts)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(i => i.Report)
+        //     .AutoInclude();
     }
 }

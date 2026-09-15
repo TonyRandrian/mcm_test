@@ -4,6 +4,7 @@ namespace Mcm.Property.Domain.Enums
     {
         Company,
         TeamMember,
-        Contact
+        Contact,
+        Other
     }
 }

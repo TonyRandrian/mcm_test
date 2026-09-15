@@ -1,3 +1,4 @@
+using Mcm.Property.Domain.Events;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Extensions;
@@ -7,7 +8,8 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Property.Domain.Entities
 {
-    public class Property : AuditableEntity, ITenantScoped
+    public class Property
+        : AggregateRoot, ITenantScoped
     {
         public Name Name { get; private set; } = null!;
         public string? Description
@@ -18,6 +20,7 @@ namespace Mcm.Property.Domain.Entities
         public bool IsSystem { get; init; }
         public bool IsRequired { get; private set; }
         public bool IsMultiple { get; private set; }
+        public bool IsSensitive { get; private set; }
         public Guid CategoryId { get; private set; }
         public Guid TenantId { get; set;}
         public PropertyType Type { get; private set; }
@@ -26,7 +29,7 @@ namespace Mcm.Property.Domain.Entities
 
         private Property() { }
 
-        private Property(Guid categorieId, string name, string? description, string type, bool isRequired, bool isMultiple,  bool isSystem)
+        private Property(Guid categorieId, string name, string? description, string type, bool isRequired, bool isMultiple,  bool isSystem, bool isSensitive)
         {
             CategoryId = categorieId;
             Name = name;
@@ -35,10 +38,15 @@ namespace Mcm.Property.Domain.Entities
             IsSystem = isSystem;
             IsRequired = isRequired;
             IsMultiple = isMultiple;
+            IsSensitive = isSensitive;
         }
 
-        public static Property Create(Guid categoryId, string name, string? description = null, string type = "Text", bool isRequired = false, bool isMultiple = false, bool isSystem = false)
-            => new(categoryId, name, description, type, isRequired, isMultiple, isSystem);
+        public static Property Create(Guid categoryId, string name, string? description = null, string type = "Text", bool isRequired = false, bool isMultiple = false, bool isSystem = false, bool isSensitive = false)
+        {
+            Property property = new(categoryId, name, description, type, isRequired, isMultiple, isSystem, isSensitive);
+            property.RaiseDomainEvent(new PropertyCreatedEvent(property.Id, property.Name));
+            return property;
+        }
 
         public void Update(string? name, string? description, string? type)
         {
@@ -46,6 +54,13 @@ namespace Mcm.Property.Domain.Entities
             if (description is not null) ChangeDetail(description);
             if (type is not null) ChangeType(type);
             SetUpdatedAt();
+            RaiseDomainEvent(new PropertyUpdatedEvent(Id, Name));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new PropertyDeletedEvent(Id, Name));
         }
 
         private void ChangeName(string name) => Name = name.ToTitleCase();

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Infrastructure\Mcm.Shared.Infrastructure.csproj" />
     <ProjectReference Include="..\Application\Mcm.Interactions.Application.csproj" />
   </ItemGroup>
 

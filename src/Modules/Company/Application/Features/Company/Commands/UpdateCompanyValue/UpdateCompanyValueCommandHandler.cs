@@ -3,15 +3,15 @@ using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Application.Modules;
+using Mcm.Shared.Domain.Extensions;
 using MediatR;
 
 namespace Mcm.Company.Application.Features.Company.Commands.UpdateCompanyValue
 {
     public class UpdateCompanyValueCommandHandler(
-        ICurrentUserService currentUserService, ICompanyRepository companyRepository, ICategoryModule categoryModule, ICompanyUow uow)
+        ICompanyRepository companyRepository, ICategoryModule categoryModule, ICompanyUow uow)
         : IRequestHandler<UpdateCompanyValueCommand, ApiResponse<UpdateCompanyValueResponse>>
     {
-        private readonly ICurrentUserService _currentUserService = currentUserService;
         private readonly ICompanyRepository _companyRepository = companyRepository;
         private readonly ICategoryModule _categoryModule = categoryModule;
         private readonly ICompanyUow _uow = uow;
@@ -45,7 +45,15 @@ namespace Mcm.Company.Application.Features.Company.Commands.UpdateCompanyValue
                 {
                     var propertyId = group.Key;
                     var property = propertyMap[propertyId];
-
+                    try
+                    {
+                        group.First().Value.ConvertTo(property.Type);
+                    }
+                    catch (FormatException)
+                    {   
+                        throw;
+                    }
+        
                     if (!property.IsMultiple)
                     {
                         company.UpdateValue(group.First().Value, propertyId);
@@ -55,7 +63,7 @@ namespace Mcm.Company.Application.Features.Company.Commands.UpdateCompanyValue
                         company.RemoveAllValuesByProperty(propertyId);
                         foreach (var item in group)
                         {
-                            company.AddValue(item.Value, propertyId, isMultiple: true);
+                            company.AddValue(item.Value, propertyId, property.IsMultiple, property.IsSensitive);
                         }
                     }
                 }
@@ -68,7 +76,7 @@ namespace Mcm.Company.Application.Features.Company.Commands.UpdateCompanyValue
                 Success = true,
                 Message = "Company value updated successfully",
                 Code = 200,
-                Data = new UpdateCompanyValueResponse{CompanyId = company.Id}
+                Data = new UpdateCompanyValueResponse{ CompanyId = company.Id }
             };
         }
     }

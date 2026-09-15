@@ -18,8 +18,8 @@ public class ServiceCategoryConfiguration : IEntityTypeConfiguration<ServiceCate
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(e => e.Services)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(e => e.Services)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

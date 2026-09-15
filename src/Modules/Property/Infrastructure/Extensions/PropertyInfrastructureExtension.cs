@@ -25,6 +25,7 @@ namespace Mcm.Property.Infrastructure.Extensions
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));  
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICategorySettingRepository, CategorySettingRepository>();
             services.AddScoped<ITenantProvider, TenantProvider>();
             services.AddScoped<IPropertyUow, PropertyUow>();
             services.AddScoped<IPropertyModule, PropertyModule>();

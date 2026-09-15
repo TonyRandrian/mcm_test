@@ -47,14 +47,14 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
             .HasForeignKey<Interaction>(i => i.ReportId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.Navigation(c => c.PresentContacts)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-        builder.Navigation(c => c.PresentMembers)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-        builder.Navigation(c => c.Interaction)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(c => c.PresentContacts)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(c => c.PresentMembers)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(c => c.Interaction)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

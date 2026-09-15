@@ -20,11 +20,10 @@ namespace Mcm.Company.Infrastructure.Database
         private readonly IMediator _mediator = mediator;
         private Guid? TenantId => _tenantProvider.GetTenantId();
 
-        public DbSet<Domain.Entities.Company> Companies { get; set; }
-        // public DbSet<CompanyValue> CompanyValues { get; set; }
-        public DbSet<TypeContact> TypeContacts { get; set; }
-        public DbSet<ActivitySector> ActivitySectors { get; set; }
-        public DbSet<CompanyActivity> CompanyActivities { get; set; }
+        public DbSet<Domain.Entities.Company> Companies => Set<Domain.Entities.Company>();
+        public DbSet<TypeContact> TypeContacts => Set<TypeContact>();
+        public DbSet<ActivitySector> ActivitySectors => Set<ActivitySector>();
+        public DbSet<CompanyActivity> CompanyActivities => Set<CompanyActivity>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,17 +33,13 @@ namespace Mcm.Company.Infrastructure.Database
             modelBuilder.Entity<TypeContact>()
                         .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId)
                         .HasQueryFilter("SoftDelete", e => !e.IsDeleted);
-
             modelBuilder.Entity<Domain.Entities.Company>()
                         .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId)
                         .HasQueryFilter("SoftDelete", e => !e.IsDeleted);
-            // modelBuilder.Entity<CompanyValue>()
-            //             .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
             modelBuilder.Entity<CompanyActivity>()
                         .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
 
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());
-            // modelBuilder.ApplyConfiguration(new CompanyValueConfiguration());
             modelBuilder.ApplyConfiguration(new TypeContactConfiguration());
             modelBuilder.ApplyConfiguration(new CompanyActivityConfiguration());
 
@@ -54,11 +49,6 @@ namespace Mcm.Company.Infrastructure.Database
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)
@@ -66,9 +56,9 @@ namespace Mcm.Company.Infrastructure.Database
     
             }
 
+            var result = await base.SaveChangesAsync(cancellationToken);
             await _mediator.DispatchDomainEventAsync(this);
-
-            return await base.SaveChangesAsync(cancellationToken);
+            return result;
         }
     }
 }

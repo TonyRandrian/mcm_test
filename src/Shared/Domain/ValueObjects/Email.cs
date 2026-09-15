@@ -12,7 +12,7 @@ namespace Mcm.Shared.Domain.ValueObjects
 
         public Email(string value)
         {
-            if (string.IsNullOrEmpty(value) && !IsValid(value))
+            if (string.IsNullOrEmpty(value) || !(new EmailAddressAttribute().IsValid(value)))
                 throw new ArgumentException("Email argument invalid", nameof(value));
             Value = value.ToLowerInvariant();
         }
@@ -20,12 +20,6 @@ namespace Mcm.Shared.Domain.ValueObjects
         public override IEnumerable<string> GetAtomicValues()
         {
             yield return Value;
-        }
-
-        public static bool IsValid(string value){
-            string pattern = @"^([\w\.-]+)@([\w-]+)((\.(\w){2,3})+)$";
-
-            return Regex.IsMatch(value, pattern, RegexOptions.IgnoreCase);
         }
 
         public static bool TryParse(string value, out string emailValue)

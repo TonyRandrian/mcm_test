@@ -13,9 +13,10 @@ namespace Mcm.Property.Infrastructure.Database
         private readonly ITenantProvider _tenantProvider = tenantProvider;
         private Guid? TenantId => _tenantProvider.GetTenantId();
         
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Domain.Entities.Property> Properties { get; set; }
-        public DbSet<CategoryEntity> CategoryEntities { get; set; }
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Domain.Entities.Property> Properties => Set<Domain.Entities.Property>();
+        public DbSet<CategoryEntity> CategoryEntities => Set<CategoryEntity>();
+        public DbSet<CategorySetting> CategorySettings => Set<CategorySetting>();
 
 
 
@@ -23,17 +24,20 @@ namespace Mcm.Property.Infrastructure.Database
         {
             modelBuilder.HasDefaultSchema("properties");
             modelBuilder.Entity<Category>()
-                    .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
-                    .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId || e.IsSystem);
+                .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
+                .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId || e.IsSystem);
             modelBuilder.Entity<Domain.Entities.Property>()
-                    .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
-                    .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId || e.IsSystem);
+                .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
+                .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId || e.IsSystem);
             modelBuilder.Entity<CategoryEntity>()
-                    .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
-                    .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
+                .HasQueryFilter("SoftDelete", e => !e.IsDeleted)
+                .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId || e.TenantId == Guid.Empty);
+            modelBuilder.Entity<CategorySetting>()
+                .HasQueryFilter("MultiTenant", e => e.TenantId == TenantId);
                     
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new CategorySettingConfiguration());
             modelBuilder.ApplyConfiguration(new PropertyConfiguration());
 
             base.OnModelCreating(modelBuilder);
@@ -41,11 +45,6 @@ namespace Mcm.Property.Infrastructure.Database
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)

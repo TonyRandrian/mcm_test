@@ -31,9 +31,6 @@ namespace Mcm.Company.Infrastructure.Extensions
             services.AddScoped<ICompanyModule, CompanyModule>();
             services.AddScoped<ITypeContactRepository, TypeContactRepository>();
             services.AddScoped<IActivitySectorRepository, ActivitySectorRepository>();
-            // services.AddScoped<IPermissionService, PermissionService>();
-            // services.AddSingleton<IAuthorizationHandler, AuthorizationRequirementHandler>();
-            // services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
             
             return services;
         }

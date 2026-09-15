@@ -54,6 +54,10 @@ namespace Mcm.Shared.Domain.Extensions
                     => Email.TryParse(text, out var emailValue) 
                         ? emailValue
                         : throw new FormatException($"Value '{text}' is not a valid Email."),
+                    PropertyType.PhoneNumber
+                    => PhoneNumber.TryParse(text, out var phoneNumberValue)
+                        ? phoneNumberValue
+                        : throw new FormatException($"Value '{text}' is not a valid Phone Number."),
                     _ => throw new NotSupportedException($"Property type '{type}' is not supported.")
                 };
             }

@@ -2,6 +2,8 @@ using Mcm.Property.Application.Features.Properties.Commands.DeleteProperty;
 using Mcm.Property.Application.Features.Properties.Commands.UpdateProperty;
 using Mcm.Property.Application.Features.Properties.Queries.GetProperty;
 using Mcm.Shared.Application.Common;
+using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +16,7 @@ public class PropertyController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.Category, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetPropertyResponse>>> GetById(
         Guid Id)
@@ -22,7 +25,7 @@ public class PropertyController(IMediator mediator)
         return Ok(result);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Property)]
+    [HasAuthorization(PermModule.Category, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdatePropertyResponse>>> Update(
         Guid Id, [FromBody] UpdatePropertyRequest body)
@@ -36,7 +39,7 @@ public class PropertyController(IMediator mediator)
         return Ok(result);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Property)]
+    [HasAuthorization(PermModule.Category, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeletePropertyResponse>>> Delete(
         Guid Id, [FromQuery] DeletePropertyRequest request)

@@ -83,4 +83,22 @@ public class ResourceService(IConfiguration conf, IWebHostEnvironment env)
     
     }
 
+    public (Stream Stream, string ContentType, string FileName) OpenResource(Resource resource)
+    {
+         if (resource.StorageType == StorageType.OnCloud)
+        throw new NotSupportedException("Cloud Storage not supported");
+
+        string basePath = resource.FileType switch
+        {
+            FileType.Image => Path.Combine(_env.ContentRootPath, _conf["FileConfiguration:image:storage"]!),
+            FileType.Document => Path.Combine(_env.ContentRootPath, _conf["FileConfiguration:document:storage"]!),
+            _ => throw new Exception("Invalid file type"),
+        };
+
+        var path = Path.Combine(basePath, resource.Url);
+        if (!File.Exists(path))
+            throw new NotFoundException("Fichier introuvable");
+
+        return (File.OpenRead(path), resource.ContentType ?? "application/octet-stream", resource.AlternativeText);
+    }
 }

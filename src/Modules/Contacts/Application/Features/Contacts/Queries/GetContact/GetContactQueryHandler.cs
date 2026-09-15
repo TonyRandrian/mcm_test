@@ -69,6 +69,7 @@ namespace Mcm.Contacts.Application.Features.Contacts.Queries.GetContact
                     {
                         PropertyId = property.Property.Id,
                         PropertyName = property.Property.Name,
+                        IsSensitive = property.Property.IsSensitive,
                         Value = value.Data
                     };
                 }).ToList()

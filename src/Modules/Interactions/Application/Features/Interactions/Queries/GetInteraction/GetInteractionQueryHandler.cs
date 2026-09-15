@@ -85,8 +85,10 @@ namespace Mcm.Interactions.Application.Features.Interactions.Queries.GetInteract
                         interaction.Reminder.Value,
                         interaction.Reminder.Repeat),
                     ReportId = interaction.ReportId,
-                    Attachments = interaction.Attachments.Select(a => 
-                        new Get_Attachment(a.ContentType, a.Url)).ToList(),
+                    Attachments = interaction.Attachments
+                        .Select(a => 
+                            new Get_Attachment(a.ContentType, a.Url))
+                        .ToList(),
                     Participant = new Get_Participant(
                         teamMembers.Select(tm =>
                             new Get_Identity(tm.Id, tm.LastName, tm.FirstName, tm.Image, tm.Email)).ToList(),

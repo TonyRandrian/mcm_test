@@ -1,6 +1,6 @@
-using System.Runtime.InteropServices.Marshalling;
-using Mcm.Interactions.Domain.Enums;
+using Mcm.Interactions.Domain.Events;
 using Mcm.Interactions.Domain.ValueObjects;
+using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 using Mcm.Shared.Domain.ValueObjects;
@@ -53,8 +53,8 @@ public class Interaction : AggregateRoot, ITenantScoped
     }
 
     public static Interaction Create(
-        string title, 
-        Guid typeId, 
+        string title,
+        Guid typeId,
         string? note,
         string startDate,
         string endDate,
@@ -62,11 +62,16 @@ public class Interaction : AggregateRoot, ITenantScoped
         double? reminderValue,
         int? reminderRepeat,
         Guid createdBy)
-        => new (title, typeId, note, startDate, endDate, reminderType, reminderValue, reminderRepeat, createdBy);
+    {
+        Interaction interaction = new(title, typeId, note, startDate, endDate, reminderType, reminderValue, reminderRepeat, createdBy);
+        if (interaction.Date.StartDate < DateTime.UtcNow)
+            throw new DomainException("Can't create passed interaction");
+        interaction.RaiseDomainEvent(new InteractionCreatedEvent(interaction.Id, interaction.Title, interaction.Date, interaction.Reminder));
+        return interaction;
+    }
 
     public void Update(
-        string title, 
-        Guid typeId, 
+        string title,
         string? note,
         string startDate,
         string endDate,
@@ -75,10 +80,16 @@ public class Interaction : AggregateRoot, ITenantScoped
         int? reminderRepeat)
     {
         Title = title;
-        TypeId =  typeId;
         Note =  note;
         Date = DataTime.Create(startDate, endDate);
         Reminder = Reminder.Create(reminderType, reminderValue, reminderRepeat);
+        RaiseDomainEvent(new InteractionUpdatedEvent(Id, Title));
+    }
+
+    public override void Delete()
+    {
+        base.Delete();
+        RaiseDomainEvent(new InteractionDeletedEvent(Id, Title));
     }
 
     public void SetReport(Guid reportId)
@@ -133,6 +144,18 @@ public class Interaction : AggregateRoot, ITenantScoped
         _attachments.Add(resource);
     }
 
+    public List<Resource> SyncAttachments(IEnumerable<string> urls, List<Resource> newResources)
+    {
+        var keep = urls.ToHashSet();
+        var toRemove = _attachments.Where(a => !keep.Contains(a.Url)).ToList();
+        foreach (var resource in newResources)
+        {
+            AddResource(resource);
+        }
+
+        return toRemove;
+    }
+
     public void UpdateFieldValue(Guid fvId, string value)
     {
         var exists = _fieldsValues.FirstOrDefault(v => v.TypeFieldId == fvId);
@@ -155,15 +178,11 @@ public class Interaction : AggregateRoot, ITenantScoped
 
     public int AttachmentCount() => _attachments.Count();
 
-    public void SyncAttachment(List<Guid> contactIds)
+
+    public void MarkAsDone()
     {
-        var hashContactsIds = contactIds.ToHashSet();
-        _interactionContacts.RemoveAll(
-            im => !contactIds.Contains(im.ContactId));
-        foreach (var contactId in hashContactsIds.ToList())
-        {
-            AddMember(contactId);
-        }
+        if (!IsDone)
+            IsDone = true;
     }
 
 }

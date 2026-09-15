@@ -1,3 +1,4 @@
+using Mcm.Interactions.Domain.Events;
 using Mcm.Interactions.Domain.ValueObjects;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
@@ -6,7 +7,7 @@ using Mcm.Shared.Domain.ValueObjects;
 namespace Mcm.Interactions.Domain.Entities
 {
     public class Report
-        : AuditableEntity, ITenantScoped
+        : AggregateRoot, ITenantScoped
     {
         public Name Name { get; set; } = null!;
         public string Description { get; set; } = string.Empty;
@@ -47,8 +48,17 @@ namespace Mcm.Interactions.Domain.Entities
             string actionPlan,
             string startDate,
             string endDate)
-            => new(interactionId, name, description, actionPlan, startDate, endDate);
+        {
+            Report report = new(interactionId, name, description, actionPlan, startDate, endDate);
+            report.RaiseDomainEvent(new ReportCreatedEvent(report.Id, report.Name));
+            return report;
+        }
 
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new ReportDeletedEvent(Id, Name));
+        }
         public void AddResource(Resource resource)
         {
             if (_attachments.FirstOrDefault(i => i.Url == resource.Url) is not null)

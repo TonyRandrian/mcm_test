@@ -16,8 +16,8 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiariesById
         public async Task<ApiResponse<GetSubsidiariesByIdResponse>> Handle(GetSubsidiariesByIdQuery query, CancellationToken cancellationToken)
         {
             var companies = await _companyRepository.GetAllAsync(
-                predicate: (e => e.ParentId == query.CompanyId), 
-                orderBy: (e => e.OrderByDescending(c => c.CreatedAt)), 
+                predicate: e => e.ParentId == query.CompanyId, 
+                orderBy: e => e.OrderByDescending(c => c.CreatedAt), 
                 pageQuery: new PageQuery(query.Page, query.Limit)
                 , ct: cancellationToken);
 
@@ -26,7 +26,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiariesById
                 Success = true,
                 Message = "Subsidiaries retrieved successfully",
                 Code = 200,
-                Data = new GetSubsidiariesByIdResponse(companies.Select(company => new SubsidiariesByIdResponse
+                Data = new GetSubsidiariesByIdResponse([.. companies.Select(company => new SubsidiariesByIdResponse
                 {
                     Id = company.Id,
                     Name = company.Name,
@@ -34,7 +34,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiariesById
                     Description = company.Description,
                     Logo = company.Logo,
                     CreatedAt = company.CreatedAt
-                }).ToList())
+                })])
             };
 
         }

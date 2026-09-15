@@ -4,7 +4,7 @@ using Mcm.Shared.Domain.Primitives;
 namespace Mcm.Authorizations.Domain.Entities
 {
     public class RoleCompany
-        : BaseEntity, ITenantScoped
+        : ITenantScoped
     {
         public Guid RoleId { get; private set; }
         public Guid CompanyId { get; private set; }

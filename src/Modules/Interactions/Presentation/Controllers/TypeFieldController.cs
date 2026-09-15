@@ -1,13 +1,11 @@
-using System.Text.Json;
-using Mcm.Interactions.Application.Features.Interactions.Queries.GetAllInteraction;
 using Mcm.Interactions.Application.Features.TypeFields.Commands.DeleteTypeField;
 using Mcm.Interactions.Application.Features.TypeFields.Commands.UpdateTypeField;
 using Mcm.Interactions.Application.Features.TypeFields.Queries.GetAllTypeField;
 using Mcm.Interactions.Application.Features.TypeFields.Queries.GetTypeField;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Interactions.Presentation.Controllers;
@@ -19,7 +17,7 @@ public class TypeFieldController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
-    // [HasAuthorization(PermissionsEnum.View_Company)] 
+    [HasAuthorization(PermModule.InteractionType, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetTypeFieldResponse>>> GetById(        
         Guid Id)
@@ -30,7 +28,7 @@ public class TypeFieldController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.InteractionType, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateTypeFieldResponse>>> Update(
         Guid Id, [FromForm] UpdateTypeFieldRequest body)
@@ -61,7 +59,7 @@ public class TypeFieldController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.InteractionType, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteTypeFieldResponse>>> DeleteCompany   
         (Guid Id, [FromQuery] DeleteTypeFieldRequest request)

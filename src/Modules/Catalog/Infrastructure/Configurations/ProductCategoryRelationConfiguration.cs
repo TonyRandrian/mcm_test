@@ -23,8 +23,8 @@ namespace Mcm.Catalog.Infrastructure.Configurations
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.Navigation(e => e.Product)
-                .UsePropertyAccessMode(PropertyAccessMode.Property);
+            // builder.Navigation(e => e.Product)
+            //     .UsePropertyAccessMode(PropertyAccessMode.Property);
             builder.Navigation(e => e.Category)
                 .AutoInclude()
                 .UsePropertyAccessMode(PropertyAccessMode.Property);

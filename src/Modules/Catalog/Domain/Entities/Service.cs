@@ -1,3 +1,4 @@
+using Mcm.Catalog.Domain.Events;
 using Mcm.Shared.Domain.Exceptions;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
@@ -5,7 +6,7 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Catalog.Domain.Entities
 {
-    public class Service : AuditableEntity, ITenantScoped
+    public class Service : AggregateRoot, ITenantScoped
     {
         public string Name { get; private set; } = string.Empty;
         public string Description { get; private set; } = string.Empty;
@@ -39,7 +40,9 @@ namespace Mcm.Catalog.Domain.Entities
         {
             if (maxPrice < minPrice) 
                 throw new InvalidOperationException("maxPrice must be greater than minPrice");
-            return new(companyId, name, description, minPrice, maxPrice, unit, currencyId, categoryId);
+            Service service = new(companyId, name, description, minPrice, maxPrice, unit, currencyId, categoryId);
+            service.RaiseDomainEvent(new ServiceCreatedEvent(service.Id, service.Name));
+            return service;
         }
 
         public void Update(string name, string description, decimal minPrice, decimal maxPrice, string unit, Guid currencyId, Guid? categoryId)
@@ -51,6 +54,13 @@ namespace Mcm.Catalog.Domain.Entities
             Unit = unit;
             CurrencyId = currencyId;
             CategoryId = categoryId;
+            RaiseDomainEvent(new ServiceUpdatedEvent(Id, Name));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new ServiceDeletedEvent(Id, Name));
         }
 
         public void UpdateCoverPicture(Resource coverPicture)

@@ -1,7 +1,6 @@
 using Mcm.Catalog.Application.Interfaces;
 using Mcm.Catalog.Infrastructure.Database;
 using Mcm.Catalog.Infrastructure.Repositories;
-using Mcm.Company.Application.Interfaces;
 using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Application.Services;
 using Mcm.Shared.Infrastructure.Autorisations;

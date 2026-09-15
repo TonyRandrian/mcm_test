@@ -54,7 +54,7 @@ namespace Mcm.Contacts.Application.Features.Contacts.Commands.CreateContact
                 var property = await _propertyModule.GetByIdAsync(valueAdd.PropertyId);
                 if (property is not null)
                 {
-                    contact.AddValue(valueAdd.Value, property.Id, property.IsMultiple);
+                    contact.AddValue(valueAdd.Value, property.Id, property.IsMultiple, property.IsSensitive);
                 }       
             }
 

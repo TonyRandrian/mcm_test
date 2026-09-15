@@ -32,7 +32,8 @@ namespace Mcm.Property.Application.Features.Categories.Queries.GetCategory
                         Name = prop.Name,
                         Type = prop.Type.ToString(),
                         IsRequired = prop.IsRequired,
-                        IsMultiple = prop.IsMultiple
+                        IsMultiple = prop.IsMultiple,
+                        IsSensitive = prop.IsSensitive
                     })]
                 }
             };

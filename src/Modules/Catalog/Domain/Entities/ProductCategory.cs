@@ -1,9 +1,10 @@
-﻿using Mcm.Shared.Domain.Interfaces;
+﻿using Mcm.Catalog.Domain.Events;
+using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 
 namespace Mcm.Catalog.Domain.Entities;
 
-public class ProductCategory : AuditableEntity, ITenantScoped
+public class ProductCategory : AggregateRoot, ITenantScoped
 {
     public string Name { get; private set; } = string.Empty;
     public Guid TenantId { get; set; }
@@ -20,11 +21,22 @@ public class ProductCategory : AuditableEntity, ITenantScoped
     }
 
     public static ProductCategory Create(Guid? parentId, string name)
-        => new(parentId, name);
+    {
+        ProductCategory category = new(parentId, name);
+        category.RaiseDomainEvent(new ProductCategoryCreatedEvent(category.Id, category.Name));
+        return category;
+    }
 
     public void Update(string name)
     {
         Name = name;
         SetUpdatedAt();
+        RaiseDomainEvent(new ProductCategoryUpdatedEvent(Id, Name));
+    }
+
+    public override void Delete()
+    {
+        base.Delete();
+        RaiseDomainEvent(new ProductCategoryDeletedEvent(Id, Name));
     }
 }

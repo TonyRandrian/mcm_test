@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Mcm.Authorizations.Application.Interfaces;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
@@ -15,6 +16,7 @@ namespace Mcm.Authorizations.Application.Features.Roles.Queries.GetAllRole
         public async Task<ApiResponse<GetAllRoleResponse>> Handle(GetAllRoleQuery query, CancellationToken cancellationToken)
         {
             var role = await _roleRepository.GetAllAsync(
+                includes: [role => role.Members],
                 pageQuery: new PageQuery(query.Header.Page, query.Header.Limit)
             );
         

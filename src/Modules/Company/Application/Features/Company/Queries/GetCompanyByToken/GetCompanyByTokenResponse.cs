@@ -34,6 +34,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
     {
         public Guid PropertyId { get; set; }
         public string PropertyName { get; set; } = string.Empty;
+        public bool IsSensitive { get; set; }
         public object Value { get; set; } = null!;
     }
 

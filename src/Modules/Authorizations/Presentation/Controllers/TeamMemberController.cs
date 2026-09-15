@@ -6,6 +6,7 @@ using Mcm.Authorizations.Application.Features.TeamMembers.Commands.UpdateInfoTea
 using Mcm.Authorizations.Application.Features.TeamMembers.Commands.UpdateTmValue;
 using Mcm.Authorizations.Application.Features.TeamMembers.Commands.UploadPhoto;
 using Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetAllTeamMember;
+using Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetCurrentTeamMember;
 using Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetTeamMember;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
@@ -23,6 +24,13 @@ public class TeamMemberController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HttpGet("me")]
+    public async Task<ActionResult<ApiResponse<GetCurrentTeamMemberResponse>>> CurrentUser()
+    {
+        var res = await _mediator.Send(new GetCurrentTeamMemberQuery());
+        return Ok(res);
+    }
+
     [HttpGet]
     public async Task<ActionResult<ApiResponse<GetAllTeamMemberResponse>>> GetAll
         ([FromQuery] GetAllTeamMemberRequestHeader header)
@@ -31,7 +39,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.View_TeamMember)]
+    [HasAuthorization(PermModule.TeamMember, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetTeamMemberResponse>>> GetById
         (Guid Id)
@@ -42,7 +50,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_TeamMember)]
+    [HasAuthorization(PermModule.TeamMember, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateInfoTeamMemberResponse>>> Update
         (Guid Id, [FromBody] UpdateInfoTeamMemberRequest body)
@@ -57,6 +65,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.TeamMember, PermAction.Update)]
     [HttpPost("{Id}/photo")]
     public async Task<ActionResult<ApiResponse<UploadPhotoResponse>>> UploadPhoto
         (Guid Id, [FromForm] UploadPhotoRequest body)
@@ -69,6 +78,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.TeamMember, PermAction.Update)]
     [HttpPost("{Id}/reset-password")]
     public async Task<ActionResult<ApiResponse<ResetPasswordResponse>>> ResetPassword
         (Guid Id, [FromForm] ResetPasswordRequest body)
@@ -81,7 +91,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
-    
+    [HasAuthorization(PermModule.TeamMember, PermAction.Create)]
     [HttpPost("/api/company/{Id}/invite")]
     public async Task<ActionResult<ApiResponse<InviteTeamMemberResponse>>> Invite
         (Guid Id, [FromBody] InviteTeamMemberRequestBody body)
@@ -98,6 +108,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
+    [AllowAnonymous]
     [HttpPost("invitation_accepted")]
     public async Task<ActionResult<ApiResponse<InvitationAcceptedTeamMemberResponse>>> AcceptedInvitation
         ([FromBody] InvitationAcceptedTeamMemberRequest body)
@@ -106,13 +117,13 @@ public class TeamMemberController(IMediator mediator)
         {
             FirstName = body.FirstName,
             LastName = body.LastName,
-            Email = body.Email,
             AccessToken = body.AccessToken,
             Password = body.Password,
         });
         return Ok(res);
     }
 
+    [AllowAnonymous]
     [HttpPost("invitation_denied")]
     public async Task<ActionResult<ApiResponse<InvitationDeniedTeamMemberResponse>>> DeniedInvitation
         ([FromBody] InvitationDeniedTeamMemberRequest body)
@@ -124,6 +135,7 @@ public class TeamMemberController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.TeamMember, PermAction.Update)]
     [HttpPut("{Id}/values")]
     public async Task<ActionResult<ApiResponse<UpdateTmValueResponse>>> UpdateTmValue(
         Guid Id, [FromBody] List<UpdateTmValueRequest> body)
@@ -135,5 +147,4 @@ public class TeamMemberController(IMediator mediator)
         });
         return Ok(res);
     }
-   
 }

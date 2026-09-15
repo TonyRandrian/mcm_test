@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Mcm.Company.Application.Interfaces;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
@@ -17,9 +18,10 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiaries
         {
             var id = _currentUserService.CompanyId;
             var companies = await _companyRepository.GetAllAsync(
-                predicate: (e => e.ParentId == id),
-                orderBy: (e => e.OrderBy(c => c.CreatedAt)),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit)
+                predicate: e => e.ParentId == id,
+                orderBy: e => e.OrderByDescending(c => c.CreatedAt),
+                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit),
+                ct: cancellationToken
             );
 
             return new ApiResponse<GetSubsidiariesResponse>
@@ -27,7 +29,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiaries
                 Success = true,
                 Message = "Subsidiaries retrieved successfully",
                 Code = 200,
-                Data = new GetSubsidiariesResponse(companies.Select(company => new SubsidiariesResponse
+                Data = new GetSubsidiariesResponse([.. companies.Select(company => new SubsidiariesResponse
                 {
                     Id = company.Id,
                     Name = company.Name,
@@ -35,7 +37,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetSubsidiaries
                     Description = company.Description,
                     Logo = company.Logo,
                     CreatedAt = company.CreatedAt
-                }).ToList())
+                })])
             };
 
         }

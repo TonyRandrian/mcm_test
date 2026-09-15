@@ -14,13 +14,16 @@ namespace Mcm.Shared.Infrastructure.Repositories
         protected readonly DbSet<T> _dbSet = context.Set<T>();
 
         public async Task<IEnumerable<T>> GetAllAsync(
-            Expression<Func<T, bool>>? predicate = null, 
+            Expression<Func<T, object?>>[]? includes = null, 
+            Expression<Func<T, bool>>? predicate = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, 
             Func<IQueryable<T>, IQueryable<T>>? selector = null, 
             PageQuery? pageQuery = null, CancellationToken ct = default)
         {
             IQueryable<T> query = _dbSet;
 
+            if (includes is not null)
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
             if (predicate is not null) query = query.Where(predicate);
             if (orderBy is not null) query = orderBy(query);
             if (pageQuery is not null)
@@ -31,18 +34,14 @@ namespace Mcm.Shared.Infrastructure.Repositories
                 return await selector(query).ToListAsync(ct);
             return (IEnumerable<T>)await query.ToListAsync(ct);
         }
-
         public virtual async Task<T?> GetByIdAsync(Guid id)
             => await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
-
         public async Task AddAsync(T entity)
             => await _dbSet.AddAsync(entity);
 
         public void Update(T entity)
         {
             _dbSet.Update(entity);
-            // _dbSet.Attach(entity);
-            // _context.Entry(entity).State = EntityState.Modified;
         }
 
         public void HardDelete(T entity) => _dbSet.Remove(entity);
@@ -52,9 +51,14 @@ namespace Mcm.Shared.Infrastructure.Repositories
                 .Where(predicate)
                 .FirstOrDefaultAsync();
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            IQueryable<T> query = _dbSet;
+            if (predicate is not null) query = query.Where(predicate);
+            return await query.CountAsync();
+        }
 
-        public async Task<int> CountAsync()
-            => await _dbSet.CountAsync();
-
+        public async Task AddManyAsync(List<T> entities)
+            => await _dbSet.AddRangeAsync(entities);
     }
 }

@@ -2,14 +2,17 @@ using System.Text.Json;
 using Mcm.Authorizations.Application.Features.Auth.CheckEmail;
 using Mcm.Authorizations.Application.Features.Auth.Login;
 using Mcm.Authorizations.Application.Features.Auth.LoginForgettenPwd;
+using Mcm.Authorizations.Application.Features.Auth.RefreshToken;
 using Mcm.Authorizations.Application.Features.Auth.Register;
 using Mcm.Shared.Application.Common;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Authorizations.Presentation.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("api/auth")]
     public class AuthController(IMediator mediator)
         : ControllerBase
@@ -24,6 +27,17 @@ namespace Mcm.Authorizations.Presentation.Controllers
             {
                 Email = body.Email,
                 Password = body.Password
+            });
+            return Ok(res);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<ApiResponse<RefreshTokenResponse>>> Refresh(
+            [FromBody] RefreshTokenRequest body)
+        {
+            var res = await _mediator.Send(new RefreshTokenCommand
+            {
+                RefreshToken = body.RefreshToken
             });
             return Ok(res);
         }

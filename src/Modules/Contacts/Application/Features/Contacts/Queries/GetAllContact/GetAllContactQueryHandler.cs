@@ -40,9 +40,11 @@ namespace Mcm.Contacts.Application.Features.Contacts.Queries.GetAllContact
 
             var contacts = await contactRepository.GetAllAsync(
                 predicate: c =>
-                    c.CompanyId == currentUserService.CompanyId
-                    && (string.IsNullOrEmpty(query.Request.Search)
-                        || c.Identity.LastName.Value.ToLower().Contains(query.Request.Search.ToLower())),
+                    (string.IsNullOrEmpty(query.Request.Search) || 
+                        c.Identity.LastName.Value.ToLower().Contains(query.Request.Search.ToLower()) ||
+                        c.Identity.FirstName.Value.ToLower().Contains(query.Request.Search.ToLower()) ||
+                        c.Identity.Email.Value.ToLower().Contains(query.Request.Search.ToLower())) &&
+                    c.CompanyId == currentUserService.CompanyId,
                 orderBy: q => q.OrderByDescending(c => c.CreatedAt),
                 selector: selector,
                 pageQuery: new PageQuery(query.Request.Page, query.Request.Limit),
@@ -56,7 +58,6 @@ namespace Mcm.Contacts.Application.Features.Contacts.Queries.GetAllContact
                 var companies  = await companyModule.GetAllCompanies(companyIds);
                 companyMap     = companies.ToDictionary(c => c.Id);
             }
-
             Dictionary<Guid, string> propertyNames = [];
             if (needsValues)
             {
@@ -68,7 +69,6 @@ namespace Mcm.Contacts.Application.Features.Contacts.Queries.GetAllContact
             }
 
             var typeContactsCompany  = await companyModule.GetExistTypeContact();
-            Console.WriteLine(JsonSerializer.Serialize(typeContactsCompany));
             
             var data = contacts
                 .Select(c => Project(c, requestedFields, requestedPropertyIds, companyMap, propertyNames, typeContactsCompany))

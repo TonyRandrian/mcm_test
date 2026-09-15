@@ -62,7 +62,6 @@ namespace Mcm.Shared.Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 throw new Exception(ex.Message);
             }
             
@@ -126,17 +125,13 @@ namespace Mcm.Shared.Application.Services
                     <strong>Entreprise :</strong> {{companyName}}
                 </p>
 
-                <p style=""margin:0 0 10px 0;color:#334155;"">
-                    <strong>Token :</strong> {{token}}
-                </p>
-
             </td>
         </tr>
     </table>
 
-    <!-- BUTTON -->
+    <!-- Accepter -->
     <div style=""text-align:center;margin-top:30px;"">
-        <a href=""{{url}}/accept?token={{token}}""
+        <a href=""{{url}}/invitation?token={{token}}""
            style=""display:inline-block;
                   background-color:#2563eb;
                   color:#ffffff;
@@ -149,7 +144,7 @@ namespace Mcm.Shared.Application.Services
         </a>
     </div>
 
-    <!-- DECLINE -->
+    <!-- Refuser -->
     <div style=""text-align:center;margin-top:15px;"">
         <a href=""{{url}}/decline?token={{token}}""
            style=""color:#dc2626;
@@ -159,7 +154,6 @@ namespace Mcm.Shared.Application.Services
         </a>
     </div>
 
-    <!-- FALLBACK LINK -->
     <p style=""margin-top:30px;font-size:13px;color:#64748b;"">
         Si le bouton ne fonctionne pas, copiez ce lien :
     </p>

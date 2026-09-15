@@ -6,18 +6,28 @@ using MediatR;
 
 namespace Mcm.Catalog.Application.Features.Products.Queries.GetAllProduct
 {
-    public class GetAllProductQueryHandler(IProductRepository productRepository)
+    public class GetAllProductQueryHandler(
+        IProductRepository productRepository,
+        ICurrentUserService currentUserService)
         : IRequestHandler<GetAllProductQuery, ApiResponse<GetAllProductResponse>>
     {
         private readonly IProductRepository _productRepository = productRepository;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
         
         public async Task<ApiResponse<GetAllProductResponse>> Handle(GetAllProductQuery query, CancellationToken cancellationToken)
         {
             var products = await _productRepository.GetAllAsync(
-                predicate: p => (
-                    (string.IsNullOrEmpty(query.Request.searchName) || p.Name.Contains(query.Request.searchName))),
-                orderBy: p => p.OrderDescending(),
-                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit));
+                includes: [
+                    p => p.Currency,
+                    p => p.CategoryRelations
+                ],
+                predicate: p => 
+                    (string.IsNullOrEmpty(query.Request.searchName) || 
+                    p.Name.Contains(query.Request.searchName)) &&
+                    p.CompanyId == _currentUserService.CompanyId,
+                orderBy: p => p.OrderBy(op => op.Name),
+                pageQuery: new PageQuery(query.Request.Page, query.Request.Limit), 
+                ct: cancellationToken);
             
             var data = products.Select(res => new ProductResponse
             {
@@ -59,7 +69,7 @@ namespace Mcm.Catalog.Application.Features.Products.Queries.GetAllProduct
                 {
                     Page = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = products.Count()
+                    Total = await _productRepository.CountAsync()
                 }
             };
         }

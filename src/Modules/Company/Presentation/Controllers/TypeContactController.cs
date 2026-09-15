@@ -6,7 +6,6 @@ using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Company.Presentation.Controllers;
@@ -18,6 +17,7 @@ public class TypeContactController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.TypeContact, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateTypeContactResponse>>> Create
         ([FromBody] CreateTypeContactRequest body)
@@ -40,7 +40,7 @@ public class TypeContactController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.TypeContact, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateTypeContactResponse>>> Update(
         Guid Id, [FromForm] UpdateTypeContactRequest body)
@@ -56,7 +56,7 @@ public class TypeContactController(IMediator mediator)
     }
 
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.TypeContact, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteTypeContactResponse>>> DeleteTypeContact   
         (Guid Id, [FromQuery] DeleteTypeContactRequest request)
@@ -68,5 +68,4 @@ public class TypeContactController(IMediator mediator)
         });
         return Ok(res);
     }
-
 }

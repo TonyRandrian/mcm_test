@@ -25,9 +25,8 @@ namespace Mcm.Company.Application.Features.Company.Commands.DefineCompanyLeader
             
             var existUser = await _tmModule.Exists(command.LeaderId);
             if (!existUser)
-            {
                 throw BadRequestException.Exist("TeamMember");
-            }
+            company.UpdateLeader(command.LeaderId);
 
             _companyRepository.Update(company);
             await _uow.SaveChangesAsync(ct);
@@ -37,10 +36,7 @@ namespace Mcm.Company.Application.Features.Company.Commands.DefineCompanyLeader
                 Success = true,
                 Message = "Company deleted successfully",
                 Code = 200,
-                Data = new DefineCompanyLeaderResponse
-                {
-                    CompanyId = company.Id
-                }
+                Data = new DefineCompanyLeaderResponse{ CompanyId = company.Id }
             };
         }
     }

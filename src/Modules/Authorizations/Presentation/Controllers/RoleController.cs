@@ -7,18 +7,20 @@ using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Mcm.Company.Presentation.Controllers;
+namespace Mcm.Authorizations.Presentation.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/role")]
 public class RoleController(IMediator mediator)
     : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
-    // [HasAuthorization(PermissionsEnum.Create_Role)]
+    [HasAuthorization(PermModule.Role, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateRoleResponse>>> Create(
         [FromBody] CreateRoleRequest body)
@@ -42,6 +44,7 @@ public class RoleController(IMediator mediator)
         return Ok(res);
     }
 
+    [HasAuthorization(PermModule.Role, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetRoleResponse>>> GetById
         (Guid Id)
@@ -52,7 +55,7 @@ public class RoleController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Role)]
+    [HasAuthorization(PermModule.Role, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateRoleResponse>>> Update
         (Guid Id, [FromBody] UpdateRoleRequest body)
@@ -68,7 +71,7 @@ public class RoleController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Role)]
+    [HasAuthorization(PermModule.Role, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteRoleResponse>>> Delete(
         Guid Id, [FromQuery] DeleteRoleRequest request)

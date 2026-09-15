@@ -1,10 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using Mcm.Company.Application.Interfaces;
+using Mcm.Property.Domain.Enums;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Application.Modules;
+using Mcm.Shared.Application.Modules.DTOs;
 using MediatR;
 
 namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
@@ -25,14 +27,14 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
                 parent = await _companyRepository.GetByIdAsync(company.ParentId.Value)
                     ?? throw NotFoundException.NotFoundById(nameof(Domain.Entities.Company), company.ParentId.Value);
 
-
             var propertyIds = company.SupplValues
                 .Select(x => x.PropertyId)
                 .Distinct()
                 .ToList();
 
             var categories = await _categoryModule.GetAllAsync(propertyIds);
-            JsonSerializer.Serialize(categories);
+            var visibleCategoryIds = await _categoryModule.GetVisibleCategoryIdsAsync(EntityType.Company);
+            categories = [.. categories.Where(c => visibleCategoryIds.Contains(c.Id))];
             var propertyMap = categories
             .SelectMany(category => category.Properties.Select(info => new
             {
@@ -48,9 +50,9 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
                     x.CategoryName,
                     Property = x.Property
                 });
-            JsonSerializer.Serialize(propertyMap);
 
             var supplementaryValues = company.SupplValues
+            .Where(value => propertyMap.ContainsKey(value.PropertyId))
             .GroupBy(value =>
             {
                 if (!propertyMap.TryGetValue(value.PropertyId, out var property))
@@ -76,6 +78,7 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
                     {
                         PropertyId = property.Property.Id,
                         PropertyName = property.Property.Name,
+                        IsSensitive = property.Property.IsSensitive,
                         Value = value.Data
                     };
                 })
@@ -111,7 +114,6 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyByToken
                     SupplementaryValues = supplementaryValues
                 }
             };
-
         }
     }
 }

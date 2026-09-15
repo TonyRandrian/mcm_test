@@ -41,7 +41,7 @@ namespace Mcm.Interactions.Application.Features.Reports.Queries.GetReport
                     m.LastName,
                     m.Email
                 });
-            var contacts = await _teamMemberModule.GetIdentities(interaction.InteractionContacts.Select(im => im.ContactId).ToList());
+            var contacts = await _contactModule.GetIdentities(interaction.InteractionContacts.Select(im => im.ContactId).ToList());
             var contactsDict = contacts.ToDictionary(
                 c => c.Id,
                 c => new

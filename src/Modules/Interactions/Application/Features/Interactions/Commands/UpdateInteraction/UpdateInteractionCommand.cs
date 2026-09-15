@@ -11,14 +11,15 @@ public class UpdateInteractionCommand
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
-    public Guid TypeId { get; set; }
     public string? Note { get; set; }
     public string StartDate { get; set; } = string.Empty;
     public string EndDate { get; set; } = string.Empty;
     public string? ReminderType { get; set; } = string.Empty;
     public double? ReminderValue { get; set; }
     public int? ReminderRepeat { get; set; }
-    public List<Guid> Contacts { get; set; } = new();
-    public List<Guid> TeamMembers { get; set; } = new();
-    public List<IFormFile> Attachments { get; set; } = new();
+    public List<Guid> Contacts { get; set; } = [];
+    public List<Guid> TeamMembers { get; set; } = [];
+    public List<IFormFile> Attachments { get; set; } = [];
+    public IEnumerable<string> OldUrls { get; set; } = [];
+    public List<UpdateInteraction_Information>? Informations { get; set; } = [];
 }

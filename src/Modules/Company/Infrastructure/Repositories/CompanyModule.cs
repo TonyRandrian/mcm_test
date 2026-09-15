@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using Mcm.Company.Infrastructure.Database;
 using Mcm.Shared.Application.Modules;
@@ -30,13 +31,13 @@ namespace Mcm.Company.Infrastructure.Repositories
                 var property = await _propertyModule.GetByIdAsync(value.PropertyId);
                 if (property is not null)
                 {
-                    company.AddValue(value.Value, property.Id, property.IsMultiple);
+                    company.AddValue(value.Value, property.Id, property.IsMultiple, property.IsSensitive);
                 }
             }
             
             await _context.SaveChangesAsync();
             return new CompanyDto(
-                company.Id, company.Name, company.IsContact, company.TenantId);
+                company.Id, company.Name, company.Acronym, company.IsContact, company.TenantId);
         }
 
         public async Task<CompanyDto?> FindCompanyByIdOutTenant(Guid id)
@@ -46,7 +47,7 @@ namespace Mcm.Company.Infrastructure.Repositories
                 .IgnoreQueryFilters(["MultiTenant"])
                 .Where(c => c.Id == id)
                 .Select(c => new CompanyDto(
-                    c.Id, c.Name, c.IsContact, c.TenantId))
+                    c.Id, c.Name, c.Acronym, c.IsContact, c.TenantId))
                 .FirstOrDefaultAsync();
         }
 
@@ -56,7 +57,7 @@ namespace Mcm.Company.Infrastructure.Repositories
                 .AsNoTracking()
                 .Where(c => companies.Contains(c.Id))
                 .Select(c => new CompanyDto(
-                    c.Id, c.Name, c.IsContact, c.TenantId))
+                    c.Id, c.Name, c.Acronym, c.IsContact, c.TenantId))
                 .ToListAsync();
         }
 
@@ -66,19 +67,27 @@ namespace Mcm.Company.Infrastructure.Repositories
                 .AsNoTracking()
                 .Where(c => c.Id == id)
                 .Select(c => new CompanyDto(
-                    c.Id, c.Name, c.IsContact, c.TenantId))
+                    c.Id, c.Name, c.Acronym, c.IsContact, c.TenantId))
                 .FirstOrDefaultAsync();
         }
 
         public async Task<Dictionary<Guid, TypeContactDto>> GetExistTypeContact()
         {
-            var company = await _context.Companies
-                .Where(c => c.IsContact)
-                .Select(c => c)
-                .ToListAsync();
+            var types = await _context.TypeContacts
+                .ToDictionaryAsync(
+                    c => c.Id, 
+                    c => new
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Color = c.Color,
+                    }
+                );
 
-            return company.ToDictionary(c => c.Id, c => new TypeContactDto(
-                c.TypeContactId ?? Guid.Empty, c.TypeContact?.Name ?? null!, c.TypeContact?.Color ?? null!
+            return _context.Companies
+                .Where(c => c.IsContact && c.TypeContactId != null)
+                .ToDictionary(c => c.Id, c => new TypeContactDto(
+                    types[c.TypeContactId ?? Guid.Empty].Id, types[c.TypeContactId ?? Guid.Empty].Name, types[c.TypeContactId ?? Guid.Empty].Color
             ));
         }
 

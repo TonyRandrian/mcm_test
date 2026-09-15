@@ -1,15 +1,25 @@
+using System.Net;
 using Mcm.Authorizations.Application.Interfaces;
+using Mcm.Authorizations.Domain.Entities;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Domain.ValueObjects;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Headers;
 
 namespace Mcm.Authorizations.Application.Features.Auth.Login
 {
-    public class LoginCommandHandler(ITeamMemberRepository teamMemberRepository, IAuthorizationUow uow, IHashPasswordService hashPasswordService, IJwtTokenService jwtTokenService) : IRequestHandler<LoginCommand, ApiResponse<LoginResponse>>
+    public class LoginCommandHandler(
+        ITeamMemberRepository teamMemberRepository, 
+        IRefreshTokenRepository refreshTokenRepository, 
+        IAuthorizationUow uow,
+        IHashPasswordService hashPasswordService, 
+        IJwtTokenService jwtTokenService) : IRequestHandler<LoginCommand, ApiResponse<LoginResponse>>
     {
         private readonly ITeamMemberRepository _teamMemberRepository = teamMemberRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
         private readonly IAuthorizationUow _uow = uow;
         private readonly IHashPasswordService _hashPasswordService = hashPasswordService;
         private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
@@ -17,24 +27,29 @@ namespace Mcm.Authorizations.Application.Features.Auth.Login
         public async Task<ApiResponse<LoginResponse>> Handle(LoginCommand command, CancellationToken cancellationToken)
         {
             var user = await _teamMemberRepository.GetByEmailAsync(new Email(command.Email))
-                    ?? throw NotFoundException.NotFoundByEmail(command.Email);
+                ?? throw NotFoundException.NotFoundByEmail(command.Email);
 
             if (! _hashPasswordService.VerifyPassword(user.HashedPassword, command.Password))
                 throw new BadRequestException("Invalid password");
+
+            string token = await _jwtTokenService.GenerateToken(user);
+            string refreshToken = _jwtTokenService.GenerateRefreshToken();
+            await _refreshTokenRepository.AddAsync(
+                Domain.Entities.RefreshToken.Create(refreshToken, user.Id, user.CompanyId));
 
             user.Connect();
             _teamMemberRepository.Update(user);
             
             await _uow.SaveChangesAsync(cancellationToken);
-
             return new ApiResponse<LoginResponse>
             {
                 Success = true,
-                Message = "Login successful",
+                Message = "Login successfully",
                 Code = 200,
                 Data = new LoginResponse
                 {
-                    Token = await _jwtTokenService.GenerateToken(user),
+                    Token = token,
+                    RefreshToken = refreshToken,
                     CompanyId = user.CompanyId
                 }
             };

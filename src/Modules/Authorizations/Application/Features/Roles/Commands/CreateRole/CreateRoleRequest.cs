@@ -5,6 +5,8 @@ namespace Mcm.Authorizations.Application.Features.Roles.Commands.CreateRole
         string Title,
         string Description,
         List<Guid> Companies,
-        IEnumerable<(string Module, string Action)> Permissions
+        IEnumerable<CreateRole_Permission> Permissions
     );
+
+    public record CreateRole_Permission(string Module, string Action);
 }

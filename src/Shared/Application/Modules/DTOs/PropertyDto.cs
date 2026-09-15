@@ -10,6 +10,7 @@ namespace Mcm.Shared.Application.Modules.DTOs
         bool IsSystem,
         bool IsRequired,
         bool IsMultiple,
+        bool IsSensitive,
         PropertyType Type
     );
 }

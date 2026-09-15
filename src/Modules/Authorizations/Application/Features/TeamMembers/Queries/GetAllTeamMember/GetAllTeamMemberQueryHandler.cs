@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Mcm.Authorizations.Application.Features.TeamMembers.Commands.UpdateTmValue;
 using Mcm.Authorizations.Application.Interfaces;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Interfaces;
@@ -15,9 +16,11 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetAllTeam
         public async Task<ApiResponse<GetAllTeamMemberResponse>> Handle(GetAllTeamMemberQuery query, CancellationToken cancellationToken)
         {
             var teamMembers = await _teamMemberRepository.GetAllAsync(
-                predicate: tm => tm.CompanyId == _currentUserService.CompanyId,
+                includes: [tm => tm.Roles],
+                predicate: tm => tm.CompanyId == _currentUserService.CompanyId, 
                 orderBy: tm => tm.OrderByDescending(e => e.CreatedAt),
-                pageQuery: new PageQuery(query.Header.Page, query.Header.Limit));
+                pageQuery: new PageQuery(query.Header.Page, query.Header.Limit), 
+                ct: cancellationToken);
             
             return new ApiResponse<GetAllTeamMemberResponse>
             {

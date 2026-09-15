@@ -1,3 +1,4 @@
+using Mcm.Interactions.Domain.Events;
 using Mcm.Shared.Domain.Enums;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
@@ -5,7 +6,7 @@ using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Interactions.Domain.Entities
 {
-    public class TypeField : AuditableEntity, ITenantScoped
+    public class TypeField : AggregateRoot, ITenantScoped
     {
         public Name Name { get; private set; } = null!;
         public PropertyType Type { get; private set; }
@@ -24,13 +25,24 @@ namespace Mcm.Interactions.Domain.Entities
         }
 
         public static TypeField Create(Guid interactionTypeId, string name, string type = "Text")
-            => new(interactionTypeId, name, type);
+        {
+            TypeField typeField = new(interactionTypeId, name, type);
+            typeField.RaiseDomainEvent(new TypeFieldCreatedEvent(typeField.Id, typeField.Name));
+            return typeField;
+        }
 
         public void Update(string name, string type)
         {
             Name = name;
             if (Enum.TryParse<PropertyType>(type, true, out PropertyType parsedType))
                 Type = parsedType;
+            RaiseDomainEvent(new TypeFieldUpdatedEvent(Id, Name));
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new TypeFieldDeletedEvent(Id, Name));
         }
 
     }

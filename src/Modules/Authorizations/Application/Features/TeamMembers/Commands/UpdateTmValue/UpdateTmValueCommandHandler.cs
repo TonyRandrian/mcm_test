@@ -1,7 +1,6 @@
 using Mcm.Authorizations.Application.Features.TeamMembers.Commands.UpdateTmValue;
 using Mcm.Authorizations.Application.Interfaces;
 using Mcm.Authorizations.Domain.Entities;
-using Mcm.Company.Application.Interfaces;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Application.Exceptions;
 using Mcm.Shared.Application.Interfaces;

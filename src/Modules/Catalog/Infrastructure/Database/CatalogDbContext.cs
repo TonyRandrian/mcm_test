@@ -5,22 +5,27 @@ using Mcm.Shared.Application.Interfaces;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.ValueObjects;
 using Mcm.Shared.Infrastructure.Extensions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mcm.Catalog.Infrastructure.Database
 {
-    public class CatalogDbContext(DbContextOptions<CatalogDbContext> options, ITenantProvider tenantProvider)
+    public class CatalogDbContext(
+        DbContextOptions<CatalogDbContext> options, 
+        ITenantProvider tenantProvider,
+        IMediator mediator)
         : DbContext(options)
     {
         private readonly ITenantProvider _tenantProvider = tenantProvider;
         private Guid? TenantId => _tenantProvider.GetTenantId();
+        private readonly IMediator _mediator = mediator;
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductCategory> ProductCategories { get; set; }
-        public DbSet<ProductCategoryRelation> ProductCategoryRelations { get; set; }
-        public DbSet<Service> Services { get; set; }
-        public DbSet<ServiceCategory> ServiceCategories { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
+        public DbSet<ProductCategoryRelation> ProductCategoryRelations => Set<ProductCategoryRelation>();
+        public DbSet<Service> Services => Set<Service>();
+        public DbSet<ServiceCategory> ServiceCategories => Set<ServiceCategory>();
+        public DbSet<Currency> Currencies => Set<Currency>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,20 +56,18 @@ namespace Mcm.Catalog.Infrastructure.Database
             base.OnModelCreating(modelBuilder);
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            foreach (var entry in ChangeTracker.Entries())
-            {
-                Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
-    
-            }
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
                 if (entry.State == EntityState.Added && TenantId != Guid.Empty && TenantId.HasValue)
                     entry.Entity.TenantId = TenantId.Value;
     
             }
-            return base.SaveChangesAsync(cancellationToken);
+            
+            var result = await base.SaveChangesAsync(cancellationToken);
+            await _mediator.DispatchDomainEventAsync(this);
+            return result;
         }
     }
 }

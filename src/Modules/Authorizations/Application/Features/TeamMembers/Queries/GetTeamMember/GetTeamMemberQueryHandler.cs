@@ -65,6 +65,7 @@ namespace Mcm.Authorizations.Application.Features.TeamMembers.Queries.GetTeamMem
                     {
                         PropertyId = property.Property.Id,
                         PropertyName = property.Property.Name,
+                        IsSensitive = property.Property.IsSensitive,
                         Value = value.Data
                     };
                 }).ToList()

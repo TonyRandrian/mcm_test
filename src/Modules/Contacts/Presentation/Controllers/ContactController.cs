@@ -6,8 +6,8 @@ using Mcm.Contacts.Application.Features.Contacts.Queries.GetAllContact;
 using Mcm.Contacts.Application.Features.Contacts.Queries.GetContact;
 using Mcm.Shared.Application.Common;
 using Mcm.Shared.Domain.Enums;
+using Mcm.Shared.Infrastructure.Autorisations;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mcm.Contacts.Presentation.Controllers;
@@ -19,6 +19,7 @@ public class ContactController(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;
 
+    [HasAuthorization(PermModule.Contact, PermAction.Create)]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CreateContactResponse>>> Create(
         [FromForm] CreateContactRequest body)
@@ -44,7 +45,7 @@ public class ContactController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.View_Company)] 
+    [HasAuthorization(PermModule.Contact, PermAction.Read)]
     [HttpGet("{Id}")]
     public async Task<ActionResult<ApiResponse<GetContactResponse>>> GetById(        
         Guid Id)
@@ -55,7 +56,7 @@ public class ContactController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Update_Category)]
+    [HasAuthorization(PermModule.Contact, PermAction.Update)]
     [HttpPut("{Id}")]
     public async Task<ActionResult<ApiResponse<UpdateContactResponse>>> Update(
         Guid Id, [FromForm] UpdateContactRequest body)
@@ -107,7 +108,7 @@ public class ContactController(IMediator mediator)
         return Ok(res);
     }
 
-    // [HasAuthorization(PermissionsEnum.Delete_Company)]
+    [HasAuthorization(PermModule.Contact, PermAction.Delete)]
     [HttpDelete("{Id}")]
     public async Task<ActionResult<ApiResponse<DeleteContactResponse>>> DeleteCompany   
         (Guid Id, [FromQuery] DeleteContactRequest request)
@@ -119,5 +120,4 @@ public class ContactController(IMediator mediator)
         });
         return Ok(res);
     }
-
 }

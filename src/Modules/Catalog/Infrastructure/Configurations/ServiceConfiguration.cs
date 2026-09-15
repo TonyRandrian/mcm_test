@@ -40,11 +40,11 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
             .HasForeignKey(e => e.CategoryId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
-        builder.Navigation(e => e.Currency)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-        builder.Navigation(e => e.Category)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(e => e.Currency)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
+        // builder.Navigation(e => e.Category)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

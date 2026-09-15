@@ -12,5 +12,6 @@ namespace Mcm.Property.Application.Features.Properties.Commands.CreateProperty
         public string Type { get; set; } = string.Empty;
         public bool IsRequired { get; set; }
         public bool IsMultiple { get; set; }
+        public bool IsSensitive { get; set; }
     }
 }

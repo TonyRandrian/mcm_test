@@ -21,12 +21,14 @@ namespace Mcm.Company.Application.Features.Company.Queries.GetCompanyById
     (
         Guid CategoryId,
         string CategoryName,
+        bool IsVisible,
         IEnumerable<CompanyValue> Informations
     );
     public record CompanyValue
     (
         Guid PropertyId,
         string PropertyName,
+        bool IsSensitive,
         string Value
     );
     public record ParentCompany

@@ -23,6 +23,37 @@ namespace Mcm.Authorizations.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.ActivityLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("OccuredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityLogs", "authorizations");
+                });
+
             modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.PasswordReset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,6 +108,41 @@ namespace Mcm.Authorizations.Infrastructure.Migrations
                     b.ToTable("permissions", "authorizations");
                 });
 
+            modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("TeamMemberId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamMemberId");
+
+                    b.ToTable("refresh_tokens", "authorizations");
+                });
+
             modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,11 +174,6 @@ namespace Mcm.Authorizations.Infrastructure.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -126,22 +187,16 @@ namespace Mcm.Authorizations.Infrastructure.Migrations
 
             modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.RoleCompany", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
+                    b.HasKey("RoleId", "CompanyId");
 
                     b.ToTable("role_company", "authorizations");
                 });
@@ -221,6 +276,42 @@ namespace Mcm.Authorizations.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Mcm.Authorizations.Domain.Entities.TeamMember", "TeamMember")
+                        .WithMany()
+                        .HasForeignKey("TeamMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeamMember");
+                });
+
+            modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.Role", b =>
+                {
+                    b.OwnsOne("Mcm.Shared.Domain.ValueObjects.Name", "Title", b1 =>
+                        {
+                            b1.Property<Guid>("RoleId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("title");
+
+                            b1.HasKey("RoleId");
+
+                            b1.ToTable("roles", "authorizations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RoleId");
+                        });
+
+                    b.Navigation("Title")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Mcm.Authorizations.Domain.Entities.RoleCompany", b =>

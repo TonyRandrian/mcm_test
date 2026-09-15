@@ -26,9 +26,6 @@ namespace Mcm.Interactions.Application.Features.Interactions.Commands.CreateInte
 
         public async Task<ApiResponse<CreateInteractionResponse>> Handle(CreateInteractionCommand command, CancellationToken ct)
         {
-            // TO DO : check doubled
-            // var exists = await _interactionTypeRepository.Validate() 
-
             var type = await _typeRepository.GetByIdAsync(command.TypeId)
                 ?? throw NotFoundException.NotFoundById(nameof(InteractionType), command.TypeId);
 
@@ -62,7 +59,7 @@ namespace Mcm.Interactions.Application.Features.Interactions.Commands.CreateInte
                 interaction.SyncFieldsValues(
                     command.Informations.Select(i => (i.TypeFieldId, i.Value)).ToList());
             
-             foreach (var attachment in command.Attachments)
+            foreach (var attachment in command.Attachments)
             {
                interaction.AddResource(await _resourceService.SaveResource(attachment, FileType.Document | FileType.Image));
             }

@@ -1,10 +1,11 @@
+using Mcm.Company.Domain.Events;
 using Mcm.Shared.Domain.Interfaces;
 using Mcm.Shared.Domain.Primitives;
 using Mcm.Shared.Domain.ValueObjects;
 
 namespace Mcm.Company.Domain.Entities
 {
-    public class TypeContact : AuditableEntity, ITenantScoped
+    public class TypeContact : AggregateRoot, ITenantScoped
     {
         public Name Name { get; private set; } = null!;
         public string? Description { get; private set; }
@@ -21,15 +22,26 @@ namespace Mcm.Company.Domain.Entities
             Color = color;
             TypeConvertTo = typeConvertTo;
         }
-        
+
         public static TypeContact Create(string name, string? description, string? color = null, Guid? typeConvertTo = null)
-            => new(name, description, color, typeConvertTo);
+        {
+            TypeContact typeContact = new(name, description, color, typeConvertTo);
+            typeContact.RaiseDomainEvent(new TypeContactCreatedEvent(typeContact.Id, typeContact.Name));
+            return typeContact;
+        }
 
         public void Update(string? name, string? description, string? color)
         {
             if (name is not null) ChangeName(name);
             if (description is not null && color is not null) ChangeDetail(description, color);
+            RaiseDomainEvent(new TypeContactUpdatedEvent(Id, Name));
             SetUpdatedAt();
+        }
+
+        public override void Delete()
+        {
+            base.Delete();
+            RaiseDomainEvent(new TypeContactDeletedEvent(Id, Name));
         }
 
         private void ChangeName(string name) => Name = name;

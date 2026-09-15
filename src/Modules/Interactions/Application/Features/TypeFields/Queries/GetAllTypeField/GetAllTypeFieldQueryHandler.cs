@@ -43,7 +43,12 @@ namespace Mcm.Interactions.Application.Features.TypeFields.Queries.GetAllTypeFie
                 {
                     Page  = query.Request.Page,
                     Limit = query.Request.Limit,
-                    Total = await _typeFieldRepository.CountAsync()
+                    Total = await _typeFieldRepository.CountAsync(
+                        predicate: c =>
+                        (query.Request.InteractionTypeId == null
+                            || types!.Contains(c.InteractionTypeId)) &&
+                        (string.IsNullOrWhiteSpace(query.Request.Search)
+                            || c.Name.Value.ToLower().Contains(query.Request.Search.ToLower())))
                 }
             };
         }

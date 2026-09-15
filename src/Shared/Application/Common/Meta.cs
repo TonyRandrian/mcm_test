@@ -7,6 +7,6 @@ namespace Mcm.Shared.Application.Common
         public int Limit { get; set; }
         public int PageCount => (int) Math.Ceiling(Total / (decimal) Limit);
         public bool HasNextPage => PageCount > Page;
-        public bool HasPreviousPage => Page > PageCount;
+        public bool HasPreviousPage => Page > 1;
     }
 }

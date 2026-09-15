@@ -59,13 +59,12 @@ public class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMember>
             .HasForeignKey(rt => rt.TeamMemberId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Navigation(tm => tm.SupplValues)
-            .HasField("_values")
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-        builder.Navigation(tm => tm.Roles)
-            .AutoInclude()
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
+        // builder.Navigation(tm => tm.SupplValues)
+        //     .HasField("_values")
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Navigation(tm => tm.Roles)
+        //     .AutoInclude()
+        //     .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
