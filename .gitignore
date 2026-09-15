@@ -53,8 +53,6 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-src/API/appsettings.Development.json
 src/API/assets/
 
 secrets/
-docker-compose.yml
